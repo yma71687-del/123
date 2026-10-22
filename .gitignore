@@ -1,0 +1,10 @@
+.env
+*.db
+*.sqlite
+*.sqlite3
+uploads/
+data/
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
