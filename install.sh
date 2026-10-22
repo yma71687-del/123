@@ -16,7 +16,7 @@ fi
 USER_NAME="studioadmin"
 PASSWORD="$(openssl rand -hex 12)"
 HASH="$(docker run --rm caddy:2-alpine caddy hash-password --plaintext "$PASSWORD" | tr -d '\r')"
-printf 'NEXUS_USER=%s\nNEXUS_PASSWORD_HASH=%s\n' "$USER_NAME" "$HASH" > .env
+printf "NEXUS_USER=%s\nNEXUS_PASSWORD_HASH='%s'\n" "$USER_NAME" "$HASH" > .env
 chmod 600 .env
 echo "开始构建并启动独立容器；不会绑定宿主机 80/443 端口。"
 docker compose up -d --build
