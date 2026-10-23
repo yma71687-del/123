@@ -51,6 +51,10 @@ jobs:
           docker build -t nexus-fx-review-api:0.4.0 backend
           docker build -f Dockerfile.web -t nexus-fx-review-web:0.4.0 .
           .venv/bin/python tests/docker_review.py
+      - name: Isolated authenticated online deployment and protection checks
+        env:
+          PLAYWRIGHT_USE_BUNDLED: '1'
+        run: .venv/bin/python -m unittest discover -s tests/deployment -v
       - uses: actions/upload-artifact@v4
         if: always()
         with:
