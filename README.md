@@ -2,6 +2,8 @@
 
 **0.4.0 · 第二批：可编辑的 3D 工程**。已从单文件演示页迁移到 React + TypeScript，保留第一批真实浏览器、API、音频和导出回归。当前仍不是完整的 AI 自动广告制作平台。
 
+**统一交付入口：[阶段交付包 ZIP](deliverables/NEXUS-FX-STUDIO-0.4.0-stage-delivery.zip?raw=true)**，内含可操作界面、固定版本完整源码、测试证据和校验清单。完成范围与待完成能力见 [交付清单](DELIVERY.md)。
+
 想先实际操作：下载 [独立离线试用包](preview/NEXUS-FX-STUDIO-0.4.0.zip?raw=true)，解压后用电脑 Chrome／Edge 打开“打开界面.html”。试用包只在本机浏览器保存工程与素材，不连接云端或 AI；能力与验证限制见 [试用说明](preview/README.md)。
 
 ## 已实现
