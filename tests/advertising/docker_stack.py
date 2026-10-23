@@ -13,7 +13,7 @@ import uuid
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[2]
-spec=importlib.util.spec_from_file_location('console',ROOT/'deploy/tencent_console.py')
+spec=importlib.util.spec_from_file_location('console',ROOT/'deploy/tencent_advertising.py')
 console=importlib.util.module_from_spec(spec);spec.loader.exec_module(console)
 project='nexus-ad-docker-test-'+uuid.uuid4().hex[:8]
 before=console.running_containers(['docker'])
@@ -22,16 +22,13 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
     hashed=console.password_hash(['docker'],password)
     auth=folder/'auth.env';console.write_private(auth,"NEXUS_USER=nexus\nNEXUS_PASSWORD_HASH='"+hashed+"'\n")
     with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
-    config={'services':{
-      'api':{'image':'nexus-fx-ad-api:0.5.0','environment':{'DATA_DIR':'/data','NEXUS_AD_SERVICE':'http://render:8010'},'volumes':['core:/data']},
-      'web':{'image':'nexus-fx-ad-web:0.5.0','depends_on':['api']},
-      'render':{'image':'nexus-ad-renderer:0.5.0','init':True,'shm_size':'256m','mem_limit':'1536m','cpus':1,'volumes':['core:/source-data:ro','ads:/ad-data']},
-      'gate':{'image':console.CADDY_IMAGE,'environment':{'NEXUS_USER':'${NEXUS_USER}','NEXUS_PASSWORD_HASH':'${NEXUS_PASSWORD_HASH}','NO_PROXY':'localhost,127.0.0.1,api,web,gate,render'},'volumes':[str(ROOT/'Caddyfile')+':/etc/caddy/Caddyfile:ro'],'ports':[f'127.0.0.1:{port}:80'],'depends_on':['web']},
-    },'volumes':{'core':{},'ads':{}}}
+    config=console.compose_config(ROOT,project,port)
+    for service,image in [('api','nexus-fx-ad-api:0.5.0'),('web','nexus-fx-ad-web:0.5.0'),('render','nexus-ad-renderer:0.5.0')]:
+        config['services'][service].pop('build');config['services'][service]['image']=image
     composefile=folder/'compose.json';composefile.write_text(json.dumps(config))
     command=['docker','compose','-p',project,'--env-file',str(auth),'-f',str(composefile)]
     try:
-        console.run(command+['up','-d','--no-build'])
+        console.run(command+['up','-d','--no-build','render','api','web','gate'])
         base=f'http://127.0.0.1:{port}';console.wait_gate(base,password)
         with sync_playwright() as p:
             executable=None if os.environ.get('PLAYWRIGHT_USE_BUNDLED') else shutil.which('chromium')
