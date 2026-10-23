@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import secrets
 import shutil
 import socket
 import stat
@@ -133,6 +134,29 @@ def password_hash(docker, password):
     if not re.fullmatch(r'\$2[aby]\$\d\d\$[./A-Za-z0-9]{53}',hashed):raise RuntimeError('访问密码哈希生成失败')
     SECRETS.append(hashed);return hashed
 
+def automatic_password(state):
+    path=state/'login.json'
+    if path.exists() or path.is_symlink():
+        saved=json.loads(read_private(path))
+        password=saved.get('password','')
+        if saved.get('username')!='nexus' or not isinstance(password,str) or not re.fullmatch(r'[A-Za-z0-9_-]{32}',password):
+            raise RuntimeError('自动登录凭据文件无效，未覆盖；不要发送此文件内容')
+    else:
+        password=secrets.token_urlsafe(24)
+        write_private(path,json.dumps({'username':'nexus','password':password})+'\n')
+    SECRETS.append(password)
+    return password
+
+def show_automatic_login(state, password):
+    # Send the credential only to the user's controlling terminal, not piped logs.
+    print('自动登录凭据保存在服务器私有文件：'+str(state/'login.json')+'（请勿发送文件内容或密码截图）。',flush=True)
+    try:
+        with open('/dev/tty','w') as terminal:
+            terminal.write('\n网页登录用户名：nexus\n自动生成的网页密码：'+password+'\n请保存密码，分享执行结果前遮住这一行。\n')
+            terminal.flush()
+    except OSError:
+        print('当前会话没有交互终端；稍后在服务器终端查看上述私有文件获取登录信息。',flush=True)
+
 def compose_config(source, project, port):
     limits={'restart':'unless-stopped','logging':{'driver':'json-file','options':{'max-size':'5m','max-file':'3'}}}
     return {'services':{
@@ -178,7 +202,9 @@ def main():
     parser.add_argument('--state-dir',type=Path,default=Path.home()/'.local/share/nexus-fx-online-v040')
     parser.add_argument('--project',default='nexus-online-v040')
     parser.add_argument('--port',type=int,default=43130)
-    parser.add_argument('--password-file',type=Path)
+    credentials=parser.add_mutually_exclusive_group()
+    credentials.add_argument('--password-file',type=Path)
+    credentials.add_argument('--auto-password',action='store_true',help='自动生成并复用网页密码，无需输入；仅显示在终端并保存到私有 login.json')
     parser.add_argument('--local-only',action='store_true',help='仅验证本机受保护入口，不创建公网隧道')
     parser.add_argument('--stop',action='store_true',help='只停止本工具创建的 NEXUS 服务，保留数据卷')
     args=parser.parse_args()
@@ -196,7 +222,13 @@ def main():
         run(compose+['stop'],visible=True);print('只停止了本工具的 NEXUS 服务；保留工程卷和其他业务。');return
     resources_available(state)
     if not owned:check_port(args.port)
-    if args.password_file:
+    if not owned:state.mkdir(parents=True,exist_ok=False,mode=0o700)
+    if lock is None:lock=acquire_lock(state)
+    marker={'owner':OWNER,'project':args.project,'source':SOURCE,'created_at':datetime.now(timezone.utc).isoformat()}
+    write_private(state/'managed.json',json.dumps(marker))
+    if args.auto_password:
+        password=automatic_password(state)
+    elif args.password_file:
         info=args.password_file.lstat()
         if not stat.S_ISREG(info.st_mode) or info.st_mode&0o077 or info.st_uid!=os.getuid():raise RuntimeError('密码文件必须由当前用户拥有且权限为 600')
         password=args.password_file.read_text().rstrip('\n')
@@ -205,13 +237,9 @@ def main():
         if not (state/'auth.env').exists() and password!=getpass.getpass('再次输入访问密码：'):raise RuntimeError('两次密码不一致，未部署')
     if not 12<=len(password)<=64 or len(password.encode('utf-8'))>72 or '\n' in password or '\r' in password:raise RuntimeError('访问密码需为 12–64 位单行文本，UTF-8 不超过 72 字节')
     SECRETS.append(password);before=running_containers(docker)
-    if not owned:state.mkdir(parents=True,exist_ok=False,mode=0o700)
-    if lock is None:lock=acquire_lock(state)
-    marker={'owner':OWNER,'project':args.project,'source':SOURCE,'created_at':datetime.now(timezone.utc).isoformat()}
-    write_private(state/'managed.json',json.dumps(marker))
     source=unpack_release(state)
     run(docker+['pull',CADDY_IMAGE],visible=True)
-    if not (state/'auth.env').exists():
+    if args.auto_password or not (state/'auth.env').exists():
         hashed=password_hash(docker,password)
         write_private(state/'auth.env',"NEXUS_USER=nexus\nNEXUS_PASSWORD_HASH='"+hashed+"'\n")
     elif not owned:raise RuntimeError('认证文件已存在，未覆盖')
@@ -223,7 +251,9 @@ def main():
     wait_gate('http://127.0.0.1:'+str(args.port),password)
     if not before.issubset(running_containers(docker)):raise RuntimeError('原有运行容器状态发生变化，需要检查；未宣称部署成功')
     if args.local_only:
-        print('本机受保护入口验收通过；公网未启用。');return
+        print('本机受保护入口验收通过；公网未启用。')
+        if args.auto_password:show_automatic_login(state,password)
+        return
     run(compose+['pull','tunnel'],visible=True);run(compose+['up','-d','--no-build','tunnel'],visible=True)
     print('等待临时 HTTPS 入口并验证登录与实际页面…',flush=True)
     deadline=time.monotonic()+150;url=None;last='隧道尚未注册'
@@ -238,7 +268,10 @@ def main():
     else:raise RuntimeError('公网验收尚未通过：'+last+'。本机数据保留，不能据隧道日志中的地址宣称上线')
     if not before.issubset(running_containers(docker)):raise RuntimeError('原有运行容器状态发生变化，需要检查')
     write_private(state/'url.txt',url+'\n')
-    print('\n公网登录及页面验收通过：'+url+'\n网页登录用户名：nexus\n密码为刚才在终端输入的值，不会打印。\n这是临时 HTTPS 地址，隧道重建可能变化；固定域名尚需接入。\n现有工程未迁移，原有服务未替换。')
+    print('\n公网登录及页面验收通过：'+url+'\n网页登录用户名：nexus')
+    if args.auto_password:show_automatic_login(state,password)
+    else:print('密码为刚才在终端输入的值，不会打印。')
+    print('这是临时 HTTPS 地址，隧道重建可能变化；固定域名尚需接入。\n现有工程未迁移，原有服务未替换。')
 
 if __name__=='__main__':
     try:main()

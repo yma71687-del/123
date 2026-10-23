@@ -1,4 +1,6 @@
 import importlib.util
+from contextlib import redirect_stdout
+import io
 import json
 import os
 from pathlib import Path
@@ -20,6 +22,37 @@ spec=importlib.util.spec_from_file_location('console',ROOT/'deploy/tencent_conso
 console=importlib.util.module_from_spec(spec);spec.loader.exec_module(console)
 
 class ConsoleSafety(unittest.TestCase):
+    def test_automatic_password_is_private_reused_and_absent_from_logs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)
+            password=console.automatic_password(folder)
+            self.assertRegex(password,r'^[A-Za-z0-9_-]{32}$')
+            self.assertEqual(console.automatic_password(folder),password)
+            login=folder/'login.json'
+            self.assertEqual(login.stat().st_mode&0o777,0o600)
+            self.assertEqual(json.loads(login.read_text())['password'],password)
+            output=io.StringIO()
+            with patch('builtins.open',side_effect=OSError('no terminal')),redirect_stdout(output):
+                console.show_automatic_login(folder,password)
+            self.assertNotIn(password,output.getvalue())
+            self.assertIn('login.json',output.getvalue())
+            self.assertNotIn(password,console.safe_message('failure '+password))
+            login.chmod(0o644)
+            with self.assertRaises(RuntimeError):console.automatic_password(folder)
+    def test_corrupt_or_linked_automatic_credentials_are_not_replaced(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp);login=folder/'login.json'
+            console.write_private(login,json.dumps({'username':'nexus','password':'invalid'}))
+            original=login.read_bytes()
+            with self.assertRaises(RuntimeError):console.automatic_password(folder)
+            self.assertEqual(login.read_bytes(),original)
+            login.rename(folder/'original');login.symlink_to(folder/'original')
+            with self.assertRaises(RuntimeError):console.automatic_password(folder)
+            self.assertEqual((folder/'original').read_bytes(),original)
+    def test_auto_password_cannot_be_combined_with_supplied_password_file(self):
+        result=subprocess.run([sys.executable,str(ROOT/'deploy/tencent_console.py'),'--auto-password','--password-file','unused'],capture_output=True,text=True)
+        self.assertEqual(result.returncode,2)
+        self.assertIn('not allowed with argument',result.stderr)
     def test_foreign_namespace_and_existing_files_are_not_overwritten(self):
         with tempfile.TemporaryDirectory() as tmp:
             state=Path(tmp)/'deployment'
@@ -66,7 +99,8 @@ class AuthenticatedOnlineStack(unittest.TestCase):
         project='nexus-auth-test-'+uuid.uuid4().hex[:10]
         docker=['docker'];before=console.running_containers(docker)
         with tempfile.TemporaryDirectory(prefix='nexus-auth-stack-') as tmp:
-            folder=Path(tmp);password=secrets.token_urlsafe(24)
+            folder=Path(tmp);password=console.automatic_password(folder)
+            self.assertEqual(console.automatic_password(folder),password)
             hashed=console.password_hash(docker,password)
             auth=folder/'auth.env';console.write_private(auth,"NEXUS_USER=nexus\nNEXUS_PASSWORD_HASH='"+hashed+"'\n")
             self.assertEqual(auth.stat().st_mode&0o777,0o600)
