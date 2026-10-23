@@ -29,8 +29,10 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$DIR/backups/$STAMP"
 cp -a "$DIR/frontend" "$DIR/backups/$STAMP/" 2>/dev/null || true
 cp -a "$DIR/backend" "$DIR/backups/$STAMP/" 2>/dev/null || true
-cp -a "$SRC/frontend" "$DIR/frontend"
-cp -a "$SRC/backend" "$DIR/backend"
+cp -a "$SRC/frontend/." "$DIR/frontend/"
+cp -a "$SRC/backend/." "$DIR/backend/"
+# Remove nested directories left by the first updater version, after the full backup above.
+rm -rf "$DIR/frontend/frontend" "$DIR/backend/backend"
 echo "4/4 重建并滚动启动应用..."
 cd "$DIR"
 docker compose build api
