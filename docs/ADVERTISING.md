@@ -8,6 +8,7 @@
 - [样片封面](../deliverables/NEXUS-MOTION-COVER.png)
 - [可重新导入的广告工程](../deliverables/NEXUS-MOTION-PROJECT.json?raw=true)
 - [实测记录与范围](TEST_REPORT_ADVERTISING.md)
+- [新版自动密码部署命令](../deploy/ADVERTISING.md)
 - 原始参考视频拆解见 [效果清单](REFERENCE_VIDEO_BREAKDOWN.md)。用户上传的原片和截图不会随源码发布。
 
 ## 如何使用
