@@ -11,6 +11,7 @@ import { api, download } from "./io";
 import type { Asset } from "./schema";
 import "./advertising.css";
 import { ReferenceAnalysis } from "./ReferenceAnalysis";
+import { CaptionEditor, type CaptionImport } from "./CaptionEditor";
 
 type Job = {
   id: string;
@@ -41,6 +42,10 @@ export function Advertising() {
   const [resolution, setResolution] = useState<"720p" | "1080p">("1080p");
   const [format, setFormat] = useState<"mp4" | "webm-alpha" | "prores">("mp4");
   const [batchTitles, setBatchTitles] = useState("");
+  const [captionImport, setCaptionImport] = useState<CaptionImport | null>(
+    null,
+  );
+  const valid = adSchema.safeParse(project).success;
   const player = useRef<PlayerRef>(null);
   const file = useRef<HTMLInputElement>(null);
   const media = useRef<HTMLInputElement>(null);
@@ -231,7 +236,11 @@ export function Advertising() {
           >
             导出 JSON
           </button>
-          <button className="primary" disabled={busy || !ready} onClick={save}>
+          <button
+            className="primary"
+            disabled={busy || !ready || !valid}
+            onClick={save}
+          >
             保存到云端
           </button>
         </div>
@@ -372,7 +381,14 @@ export function Advertising() {
           </button>
         </aside>
         <main className="ad-center">
-          <ReferenceAnalysis />
+          <ReferenceAnalysis
+            onImportSubtitles={(text, name) => {
+              setCaptionImport({ text, name, key: Date.now() });
+              document
+                .getElementById("caption-editor")
+                ?.scrollIntoView({ behavior: "smooth" });
+            }}
+          />
           <section className="panel ad-preview">
             <div className="timehead">
               <h2>实时动画与声音预览</h2>
@@ -421,6 +437,15 @@ export function Advertising() {
               合成。点击播放可听音乐和音效；示例图表数据不代表真实业务业绩。
             </p>
           </section>
+          <CaptionEditor
+            track={project.captions}
+            duration={project.duration}
+            musicEnabled={project.music.enabled}
+            sfx={project.sfx}
+            player={player}
+            incoming={captionImport}
+            onChange={(captions) => patch({ captions })}
+          />
           <section className="panel ad-audio">
             <h2>03 / 音乐与独立音效</h2>
             <label className="check">
@@ -765,7 +790,7 @@ export function Advertising() {
           </label>
           <button
             data-testid="ad-batch-render"
-            disabled={busy || !ready || !batchTitles.trim()}
+            disabled={busy || !ready || !valid || !batchTitles.trim()}
             onClick={batchRender}
           >
             批量渲染广告

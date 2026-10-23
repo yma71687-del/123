@@ -10,6 +10,8 @@ import {
 } from "remotion";
 import { Audio } from "@remotion/media";
 import type { AdProps } from "./schema";
+import { CaptionOverlay } from "./CaptionOverlay";
+import { captionSafeArea } from "./captions";
 
 const ease = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const font = '"Noto Sans CJK SC", "Microsoft YaHei", Arial, sans-serif';
@@ -251,7 +253,6 @@ function Intro(props: AdProps) {
   const p = props.project;
   return (
     <>
-      <Backdrop accent={p.accent} />
       <Orbit {...props} />
       <div style={{ position: "absolute", left: 118, top: 225, width: 780 }}>
         <div
@@ -349,7 +350,6 @@ function DataScene({
   const max = Math.max(...p.values, 1);
   return (
     <>
-      <Backdrop accent={p.accent} />
       <div
         style={{
           position: "absolute",
@@ -395,6 +395,7 @@ function DataScene({
         示例数据 · 可替换为你的产品指标
       </div>
       <svg
+        data-testid="hud-chart"
         viewBox="0 0 1100 570"
         style={{
           position: "absolute",
@@ -530,7 +531,6 @@ function GridScene({ project }: Pick<AdProps, "project">) {
   const { fps } = useVideoConfig();
   return (
     <>
-      <Backdrop accent={project.accent} />
       <div
         style={{
           position: "absolute",
@@ -640,6 +640,9 @@ export const AdFilm: React.FC<AdProps> = (props) => {
   const length = Math.round(p.duration * fps),
     a = Math.round(length / 3),
     b = Math.round((length * 2) / 3);
+  const safe = captionSafeArea(p.captions);
+  // Keep background and captions at full size; fit editable scene content into
+  // a stable safe area calculated across the whole caption track.
   // All visual coordinates use a fixed design canvas, scaled equally for preview
   // and render. Every motion is driven by Remotion frame time, never CSS timers.
   return (
@@ -659,28 +662,48 @@ export const AdFilm: React.FC<AdProps> = (props) => {
           transformOrigin: "0 0",
         }}
       >
-        {p.template === "showcase" ? (
-          <>
-            <Sequence name="01 产品卡片与标题" durationInFrames={a}>
-              <Intro {...props} />
-            </Sequence>
-            <Sequence name="02 HUD 数据广告" from={a} durationInFrames={b - a}>
-              <DataScene project={p} assetBase={props.assetBase} />
-            </Sequence>
-            <Sequence name="03 品牌片尾" from={b} durationInFrames={length - b}>
-              <GridScene project={p} />
-            </Sequence>
-          </>
-        ) : p.template === "cloud" ? (
-          <>
-            {!props.transparent && <Backdrop accent={p.accent} />}
-            <Orbit {...props} standalone />
-          </>
-        ) : p.template === "hud" ? (
-          <DataScene project={p} assetBase={props.assetBase} />
-        ) : (
-          <GridScene project={p} />
-        )}
+        {!props.transparent && <Backdrop accent={p.accent} />}
+        <div
+          style={{
+            position: "absolute",
+            width: 1920,
+            height: 1080,
+            top: safe.top,
+            left: (1920 - 1920 * safe.scale) / 2,
+            scale: safe.scale,
+            transformOrigin: "0 0",
+          }}
+        >
+          {p.template === "showcase" ? (
+            <>
+              <Sequence name="01 产品卡片与标题" durationInFrames={a}>
+                <Intro {...props} />
+              </Sequence>
+              <Sequence
+                name="02 HUD 数据广告"
+                from={a}
+                durationInFrames={b - a}
+              >
+                <DataScene project={p} assetBase={props.assetBase} />
+              </Sequence>
+              <Sequence
+                name="03 品牌片尾"
+                from={b}
+                durationInFrames={length - b}
+              >
+                <GridScene project={p} />
+              </Sequence>
+            </>
+          ) : p.template === "cloud" ? (
+            <>
+              <Orbit {...props} standalone />
+            </>
+          ) : p.template === "hud" ? (
+            <DataScene project={p} assetBase={props.assetBase} />
+          ) : (
+            <GridScene project={p} />
+          )}
+        </div>
         {!props.transparent && (
           <div
             style={{
@@ -699,6 +722,7 @@ export const AdFilm: React.FC<AdProps> = (props) => {
             <span>MOTION / {p.template.toUpperCase()}</span>
           </div>
         )}
+        <CaptionOverlay track={p.captions} accent={p.accent} />
       </div>
       <Soundtrack project={p} assetBase={props.assetBase} />
     </AbsoluteFill>

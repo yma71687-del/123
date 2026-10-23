@@ -42,6 +42,11 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             page.get_by_test_id('ad-headline').fill('容器实测 / 动画与声音')
             page.get_by_test_id('ad-duration').fill('4')
             page.get_by_label('分辨率').select_option('720p')
+            subtitle='1\n00:00:00,000 --> 00:00:04,000\n容器内真实字幕\n'
+            page.get_by_test_id('caption-upload').set_input_files({'name':'容器验收.srt','mimeType':'application/x-subrip','buffer':subtitle.encode()})
+            page.get_by_test_id('caption-apply-import').click()
+            page.get_by_label('字幕样式').select_option('plain')
+            page.get_by_label('字幕颜色',exact=True).evaluate("(el)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'#ff00ff');el.dispatchEvent(new Event('input',{bubbles:true}));}")
             page.get_by_role('button',name='保存到云端',exact=True).click()
             page.wait_for_function("()=>document.querySelector('[role=status]')?.textContent.includes('保存到云端')")
             page.get_by_test_id('ad-render').click()
@@ -55,6 +60,8 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             assert abs(float(probe['format']['duration'])-4)<.2
             pcm=subprocess.check_output(['ffmpeg','-v','error','-i',str(output),'-vn','-ac','1','-ar','8000','-f','s16le','pipe:1'])
             assert max(abs(v) for v in struct.unpack('<'+'h'*(len(pcm)//2),pcm))>300
+            rgb=subprocess.check_output(['ffmpeg','-v','error','-threads','1','-i',str(output),'-ss','1.2','-vf','crop=1280:160:0:560','-frames:v','1','-threads','1','-pix_fmt','rgb24','-f','rawvideo','pipe:1'])
+            assert sum(1 for r,g,b in zip(rgb[0::3],rgb[1::3],rgb[2::3]) if r>180 and g<100 and b>140)>400,'Subtitles must be burned into the container render'
             # Exercise the actual Nginx streaming upload and FFmpeg/Chinese OCR
             # binaries inside the API's unchanged 256 MB / 0.5 CPU limits.
             import base64
@@ -87,6 +94,10 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             assert errors==[],errors
             context.close();browser.close()
         assert before.issubset(console.running_containers(['docker']))
-        print('PASS: real Caddy login, Nginx CSP, project save, audible MP4, streamed reference upload, Chinese OCR and frame/audio extraction in limited API container')
+        print('PASS: real Caddy login, Nginx CSP, v2 project, audible MP4 with burned captions, streamed reference upload, Chinese OCR and frame/audio extraction in limited API container')
+    except BaseException:
+        diagnostic=subprocess.run(command+['logs','--no-color','--tail','100','api','render'],capture_output=True,text=True)
+        print(console.safe_message(diagnostic.stdout),flush=True)
+        raise
     finally:
         subprocess.run(command+['down','-v','--remove-orphans'],capture_output=True,text=True,check=True)

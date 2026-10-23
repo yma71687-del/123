@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { AdFilm } from "./AdFilm";
-import { defaultAd } from "./schema";
+import { adSchema, defaultAd } from "./schema";
 export const VideoRoot = () => (
   <Composition
     id="NexusAd"
@@ -15,10 +15,14 @@ export const VideoRoot = () => (
       resolution: "1080p" as const,
       transparent: false,
     }}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: Math.round(props.project.duration * 30),
-      width: props.resolution === "1080p" ? 1920 : 1280,
-      height: props.resolution === "1080p" ? 1080 : 720,
-    })}
+    calculateMetadata={({ props }) => {
+      const project = adSchema.parse(props.project);
+      return {
+        props: { ...props, project },
+        durationInFrames: Math.round(project.duration * 30),
+        width: props.resolution === "1080p" ? 1920 : 1280,
+        height: props.resolution === "1080p" ? 1080 : 720,
+      };
+    }}
   />
 );

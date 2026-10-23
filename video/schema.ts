@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { captionTrackSchema, defaultCaptionTrack } from "./captions";
 
-export const adSchema = z
+const currentAdSchema = z
   .object({
-    version: z.literal(1),
+    version: z.literal(2),
     name: z.string().min(1).max(100),
     template: z.enum(["showcase", "cloud", "hud", "grid"]),
     headline: z.string().min(1).max(32),
@@ -31,15 +32,39 @@ export const adSchema = z
         }),
       )
       .max(12),
+    captions: captionTrackSchema,
   })
   .strict()
   .superRefine((p, ctx) => {
     if (p.sfx.some((e) => e.time >= p.duration))
       ctx.addIssue({ code: "custom", message: "音效开始时间必须小于工程时长" });
+    if (p.captions.cues.some((cue) => cue.endMs > p.duration * 1000))
+      ctx.addIssue({
+        code: "custom",
+        path: ["captions"],
+        message: "字幕超过工程时长，请调整时间或裁到工程时长",
+      });
   });
+export const adSchema = z.preprocess((input) => {
+  if (
+    input &&
+    typeof input === "object" &&
+    "version" in input &&
+    input.version === 1
+  )
+    return {
+      ...input,
+      version: 2,
+      captions:
+        "captions" in input
+          ? input.captions
+          : structuredClone(defaultCaptionTrack),
+    };
+  return input;
+}, currentAdSchema);
 export type AdProject = z.infer<typeof adSchema>;
 export const defaultAd: AdProject = {
-  version: 1,
+  version: 2,
   name: "NEXUS / 科技品牌广告",
   template: "showcase",
   headline: "让创意，成为信号",
@@ -57,6 +82,7 @@ export const defaultAd: AdProject = {
     { type: "impact", time: 5, gain: 0.45 },
     { type: "whoosh", time: 10, gain: 0.4 },
   ],
+  captions: structuredClone(defaultCaptionTrack),
 };
 export const renderRequestSchema = z
   .object({

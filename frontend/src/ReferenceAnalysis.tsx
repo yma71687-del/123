@@ -42,7 +42,11 @@ function timecode(seconds: number) {
     .toString()
     .padStart(2, "0")}`;
 }
-export function ReferenceAnalysis() {
+export function ReferenceAnalysis({
+  onImportSubtitles,
+}: {
+  onImportSubtitles?: (text: string, name: string) => void;
+}) {
   const [jobs, setJobs] = useState<ReferenceJob[]>([]);
   const [selected, setSelected] = useState<ReferenceJob | null>(null);
   const [status, setStatus] = useState(
@@ -281,6 +285,51 @@ export function ReferenceAnalysis() {
               >
                 下载内嵌字幕
               </a>
+            )}
+            {report.subtitleFile && onImportSubtitles && (
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(fileURL(report.subtitleFile!));
+                    if (!response.ok || !response.body)
+                      throw Error("参考字幕无法读取，请重新解析参考片。");
+                    const reader = response.body.getReader();
+                    let size = 0;
+                    const chunks: Uint8Array[] = [];
+                    try {
+                      while (true) {
+                        const item = await reader.read();
+                        if (item.done) break;
+                        size += item.value.byteLength;
+                        if (size > 128 * 1024) {
+                          await reader.cancel();
+                          throw Error(
+                            "参考字幕超过 128 KiB，请下载后截取需要的片段再导入。",
+                          );
+                        }
+                        chunks.push(item.value);
+                      }
+                    } finally {
+                      reader.releaseLock();
+                    }
+                    const bytes = new Uint8Array(size);
+                    let offset = 0;
+                    for (const chunk of chunks) {
+                      bytes.set(chunk, offset);
+                      offset += chunk.byteLength;
+                    }
+                    onImportSubtitles(
+                      new TextDecoder("utf-8", { fatal: true }).decode(bytes),
+                      selected.name + " / 内嵌字幕",
+                    );
+                    note("字幕已送到下方字幕轨，请核对截取范围并应用。");
+                  } catch (e) {
+                    note(message(e), true);
+                  }
+                }}
+              >
+                将内嵌字幕送入广告
+              </button>
             )}
             {report.speechFile && (
               <a className="ad-back" href={fileURL(report.speechFile)} download>

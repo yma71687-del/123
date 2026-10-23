@@ -11,6 +11,11 @@ spec=importlib.util.spec_from_file_location('adconsole',ROOT/'deploy/tencent_adv
 console=importlib.util.module_from_spec(spec);spec.loader.exec_module(console)
 
 class AdvertisingInstaller(unittest.TestCase):
+    def test_vfs_runtime_copy_budget_is_checked_before_any_build(self):
+        from types import SimpleNamespace
+        with tempfile.TemporaryDirectory() as tmp,patch.object(console,'run',return_value='vfs\n'),patch.object(console.shutil,'disk_usage',return_value=SimpleNamespace(free=6*1024**3)):
+            with self.assertRaisesRegex(RuntimeError,'vfs.*20 GiB'):
+                console.resources_available(Path(tmp),['docker'])
     def test_fixed_release_extract_retry_and_local_change_preservation(self):
         archive=(ROOT/'deliverables'/console.RELEASE_URL.rsplit('/',1)[-1]).read_bytes()
         with tempfile.TemporaryDirectory() as tmp:

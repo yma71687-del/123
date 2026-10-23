@@ -1,0 +1,40 @@
+{
+  "projectVersion": 2,
+  "job": {
+    "id": "2875d8fcf51944fa9d241b37f7cbc74a",
+    "name": "NEXUS / 字幕、动画与声音实片",
+    "status": "done",
+    "progress": 1,
+    "format": "mp4",
+    "resolution": "1080p",
+    "createdAt": "2026-10-23T23:35:33.103Z",
+    "elapsedSeconds": 70.54,
+    "downloadUrl": "/api/advertising/jobs/2875d8fcf51944fa9d241b37f7cbc74a/file"
+  },
+  "streams": [
+    {
+      "type": "video",
+      "codec": "h264",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "type": "audio",
+      "codec": "aac",
+      "width": null,
+      "height": null
+    }
+  ],
+  "duration": 15.019,
+  "volume": [
+    "mean_volume: -28.2 dB",
+    "max_volume: -6.0 dB"
+  ],
+  "sha256": {
+    "NEXUS-CAPTIONS-SHOWCASE-PROJECT.json": "1c7c902ce2b8f3b71b0db147d734c1a9971d86bc4f6d63480579db68631b8507",
+    "NEXUS-CAPTIONS-SHOWCASE-SUBTITLES.srt": "1605c5d709e9a5f0f9b6331721646ef7d15bf1b9fb9200686fcedc2a763ba674",
+    "NEXUS-CAPTIONS-SHOWCASE-1080p.mp4": "c977e17eb3728e6c4041f94797ca1f8079dc6afc92d5f75a5c1ef3ae93bec5e7",
+    "NEXUS-CAPTIONS-SHOWCASE-COVER.png": "c44a58271cc8e5ee8ed61bf752c09e896c2cb8a073792345335eae85fafa48d7"
+  },
+  "scope": "Actual UI submission, caption burn-in, original music and SFX; no ASR, AI model or Tencent deployment"
+}

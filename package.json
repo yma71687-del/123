@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@remotion/bundler": "4.0.538",
+    "@remotion/captions": "4.0.538",
     "@remotion/cli": "4.0.538",
     "@remotion/media": "4.0.538",
     "@remotion/player": "4.0.538",

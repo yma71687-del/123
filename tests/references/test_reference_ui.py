@@ -20,7 +20,7 @@ class ReferenceBrowser(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='nexus-reference-ui-') as temporary:
             folder = Path(temporary)
             video = folder / 'sample.mp4'
-            fixture(video)
+            fixture(video, subtitles=True)
             with socket.socket() as sock:
                 sock.bind(('127.0.0.1', 0))
                 port = sock.getsockname()[1]
@@ -51,6 +51,11 @@ class ReferenceBrowser(unittest.TestCase):
                         self.assertEqual(page.get_by_test_id('reference-report').locator('img').count(), 2)
                         self.assertIn('1 条音轨', page.get_by_test_id('reference-report').inner_text())
                         self.assertIn('语音识别尚未接入', page.get_by_test_id('reference-report').inner_text())
+                        page.get_by_role('button', name='将内嵌字幕送入广告', exact=True).click()
+                        page.get_by_test_id('caption-import-preview').wait_for()
+                        self.assertIn('NEXUS embedded text', page.get_by_test_id('caption-import-preview').inner_text())
+                        page.get_by_test_id('caption-apply-import').click()
+                        self.assertEqual(page.get_by_label('字幕正文 1', exact=True).input_value(), 'NEXUS embedded text')
                         images = page.get_by_test_id('reference-report').locator('img')
                         self.assertTrue(images.first.evaluate('(img)=>img.complete && img.naturalWidth>0'))
                         page.locator('.reference-audio audio').evaluate('(audio)=>audio.play()')

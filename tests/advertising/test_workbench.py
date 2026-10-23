@@ -16,6 +16,7 @@ import unittest
 import urllib.error
 import urllib.request
 from playwright.sync_api import sync_playwright
+from concurrent.futures import ThreadPoolExecutor
 
 ROOT=Path(__file__).resolve().parents[2]
 RESULTS=ROOT/'.test-results/advertising'
@@ -34,6 +35,7 @@ class Advertising(unittest.TestCase):
         cls.worker_data=cls.folder/'render';cls.api_data=cls.folder/'api'
         cls.worker_log=(cls.folder/'worker.log').open('w');cls.api_log=(cls.folder/'api.log').open('w')
         worker_env={**os.environ,'AD_PORT':str(cls.worker_port),'AD_DATA_DIR':str(cls.worker_data),'NEXUS_ASSET_DIR':str(cls.api_data/'assets'),'CHROME_EXECUTABLE':browser_path}
+        cls.worker_env=worker_env
         cls.worker=subprocess.Popen(['node','--import','tsx','render-worker/server.ts'],cwd=ROOT,env=worker_env,stdout=cls.worker_log,stderr=cls.worker_log,start_new_session=True)
         api_env={**os.environ,'NEXUS_AD_SERVICE':f'http://127.0.0.1:{cls.worker_port}'}
         cls.api_process=subprocess.Popen([sys.executable,str(ROOT/'tools/dev_server.py'),'--port',str(cls.api_port),'--data-dir',str(cls.api_data),'--csp'],cwd=ROOT,env=api_env,stdout=cls.api_log,stderr=cls.api_log)
@@ -161,3 +163,134 @@ class Advertising(unittest.TestCase):
             self.assertGreater(orange,500,'Uploaded image must actually appear in encoded frames')
             self.assertEqual(errors,[])
         finally:context.close()
+
+    def test_06_caption_import_edit_scrub_save_export_and_real_encoded_timing(self):
+        project=self.fresh();project['name']='字幕成片验收';project['music']['enabled']=False
+        self.request('/api/advertising/project','PUT',{'project':project})
+        context=self.browser.new_context(viewport={'width':1600,'height':1100},accept_downloads=True)
+        page=context.new_page();errors=[];page.on('pageerror',lambda error:errors.append(str(error)))
+        try:
+            page.goto(self.base+'/#advertising');page.wait_for_selector('[data-testid=ad-render]:enabled')
+            text='1\n00:00:01,010 --> 00:00:02,010\n字幕原文\n\n2\n00:00:03,000 --> 00:00:03,600\n片尾字幕\n\n3\n00:00:09,000 --> 00:00:10,000\n窗口外字幕\n'
+            page.get_by_test_id('caption-upload').set_input_files({'name':'测试.srt','mimeType':'application/x-subrip','buffer':text.encode()})
+            page.get_by_test_id('caption-import-preview').wait_for()
+            self.assertIn('2 条，跳过窗口外 1 条',page.get_by_test_id('caption-import-preview').inner_text())
+            self.assertEqual(self.request('/api/advertising/project')['project']['captions']['cues'],[],'Preview must not silently save or replace the project')
+            page.get_by_test_id('caption-apply-import').click()
+            page.get_by_label('字幕正文 1',exact=True).fill('真实字幕测试')
+            page.get_by_label('字幕样式').select_option('plain')
+            page.get_by_label('字幕颜色',exact=True).evaluate("(el)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'#ff00ff');el.dispatchEvent(new Event('input',{bubbles:true}));}")
+            page.get_by_label('字幕结束 1',exact=True).fill('.9')
+            page.get_by_test_id('caption-validation').wait_for()
+            self.assertTrue(page.get_by_test_id('ad-render').is_disabled())
+            self.assertTrue(page.get_by_role('button',name='保存到云端',exact=True).is_disabled())
+            page.get_by_label('字幕结束 1',exact=True).fill('2.01')
+            page.get_by_test_id('caption-validation').wait_for(state='hidden')
+            page.get_by_role('button',name='定位字幕 1',exact=True).click()
+            page.get_by_test_id('caption-overlay').wait_for()
+            self.assertEqual(page.get_by_test_id('caption-scrub').input_value(),'31')
+            self.assertEqual(page.get_by_test_id('caption-overlay').inner_text(),'真实字幕测试')
+            page.get_by_test_id('caption-scrub').focus();page.get_by_test_id('caption-scrub').press('ArrowLeft')
+            page.get_by_test_id('caption-overlay').wait_for(state='hidden')
+            page.get_by_test_id('caption-scrub').press('ArrowRight');page.get_by_test_id('caption-overlay').wait_for()
+            page.get_by_role('button',name='保存到云端',exact=True).click()
+            page.wait_for_function("()=>document.querySelector('.global-status')?.textContent.includes('保存到云端')")
+            saved=self.request('/api/advertising/project')['project']
+            self.assertEqual(saved['version'],2);self.assertEqual(saved['captions']['cues'][0]['startMs'],1010)
+            self.assertEqual(saved['captions']['cues'][0]['text'],'真实字幕测试');self.assertEqual(saved['captions']['color'],'#ff00ff')
+            page.reload();page.wait_for_selector('[data-testid=ad-render]:enabled')
+            self.assertEqual(page.get_by_label('字幕正文 1',exact=True).input_value(),'真实字幕测试')
+            with page.expect_download() as download:page.get_by_role('button',name='导出 SRT',exact=True).click()
+            subtitle=RESULTS/'captions-export.srt';download.value.save_as(subtitle)
+            self.assertIn('00:00:01,010 --> 00:00:02,010',subtitle.read_text())
+            self.assertIn('真实字幕测试',subtitle.read_text())
+            page.get_by_label('分辨率').select_option('720p')
+            page.get_by_test_id('ad-render').click()
+            row=page.get_by_test_id('ad-job').filter(has_text='字幕成片验收')
+            row.locator('a').wait_for(timeout=120000)
+            with page.expect_download() as download:row.locator('a').click()
+            encoded=RESULTS/'captions-timing.mp4';download.value.save_as(encoded)
+            counts={}
+            for frame in (30,31,60,61):
+                rgb=subprocess.check_output(['ffmpeg','-v','error','-threads','1','-i',str(encoded),'-vf',f'select=eq(n\\,{frame}),crop=1280:160:0:560','-frames:v','1','-threads','1','-pix_fmt','rgb24','-f','rawvideo','pipe:1'])
+                counts[frame]=sum(1 for r,g,b in zip(rgb[0::3],rgb[1::3],rgb[2::3]) if r>180 and g<100 and b>140)
+            self.assertLess(counts[30],100,counts);self.assertGreater(counts[31],400,counts)
+            self.assertGreater(counts[60],400,counts);self.assertLess(counts[61],100,counts)
+            (RESULTS/'captions-frame-counts.json').write_text(json.dumps(counts,indent=2))
+            page.get_by_role('button',name='定位字幕 1',exact=True).click()
+            page.get_by_test_id('template-hud').click()
+            bottom_caption=page.get_by_test_id('caption-overlay').bounding_box()
+            chart=page.get_by_test_id('hud-chart').bounding_box()
+            self.assertLess(chart['y']+chart['height'],bottom_caption['y'],'HUD labels need a genuine subtitle safe area')
+            page.get_by_label('字幕位置').select_option('top')
+            top_caption=page.get_by_test_id('caption-overlay').bounding_box()
+            chart=page.get_by_test_id('hud-chart').bounding_box()
+            self.assertGreater(chart['y'],top_caption['y']+top_caption['height'])
+            page.get_by_label('字幕位置').select_option('bottom')
+            page.screenshot(path=str(RESULTS/'captions-workbench.png'),full_page=True)
+            page.set_viewport_size({'width':390,'height':844})
+            self.assertTrue(page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
+            self.assertEqual(errors,[])
+        finally:context.close()
+
+    def test_07_legacy_caption_migration_concurrent_save_guard_and_worker_restart(self):
+        legacy=self.fresh();legacy['version']=1;legacy.pop('captions')
+        file=self.worker_data/'project.json';file.write_text(json.dumps(legacy));original=file.read_bytes()
+        migrated=self.request('/api/advertising/project')['project']
+        self.assertEqual(migrated['version'],2);self.assertEqual(migrated['captions']['cues'],[])
+        self.assertEqual(file.read_bytes(),original,'GET migration must preserve original disk bytes')
+        migrated['captions']['enabled']=True
+        migrated['captions']['cues']=[{'text':'不能被旧页面覆盖','startMs':1000,'endMs':2000,'timestampMs':None,'confidence':None}]
+        self.request('/api/advertising/project','PUT',{'project':migrated})
+        def save(i):
+            try:self.request('/api/advertising/project','PUT',{'project':legacy if i%2 else migrated});return 200
+            except urllib.error.HTTPError as error:return error.code
+        with ThreadPoolExecutor(max_workers=6) as executor:codes=list(executor.map(save,range(12)))
+        self.assertEqual(codes.count(409),6);self.assertEqual(codes.count(200),6)
+        preserved=file.read_bytes()
+        bad=copy.deepcopy(migrated);bad['captions']['cues'][0]['endMs']=5000
+        with self.assertRaises(urllib.error.HTTPError) as caught:self.request('/api/advertising/project','PUT',{'project':bad})
+        self.assertEqual(caught.exception.code,422);self.assertEqual(file.read_bytes(),preserved)
+        os.killpg(self.worker.pid,signal.SIGTERM);self.worker.wait(timeout=15)
+        type(self).worker=subprocess.Popen(['node','--import','tsx','render-worker/server.ts'],cwd=ROOT,env=self.worker_env,stdout=self.worker_log,stderr=self.worker_log,start_new_session=True)
+        for _ in range(100):
+            try:self.request('/api/advertising/health');break
+            except OSError:time.sleep(.1)
+        else:self.fail('Worker did not restart')
+        self.assertEqual(self.request('/api/advertising/project')['project']['captions']['cues'][0]['text'],'不能被旧页面覆盖')
+        self.assertEqual(file.read_bytes(),preserved)
+
+    def test_08_concurrent_submissions_enforce_real_queue_capacity(self):
+        import base64
+        image=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jhFEAAAAASUVORK5CYII=')
+        boundary='nexus-queue-fixture'
+        payload=(f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="queue.png"\r\nContent-Type: image/png\r\n\r\n'.encode()+image+f'\r\n--{boundary}--\r\n'.encode())
+        upload=urllib.request.Request(self.base+'/api/assets/upload',data=payload,headers={'Content-Type':'multipart/form-data; boundary='+boundary})
+        with urllib.request.urlopen(upload) as response:asset=json.load(response)
+        project=self.fresh();project['imageAssetIds']=[asset['id']]*12
+        def submit(_):
+            try:return 202,self.request('/api/advertising/jobs','POST',{'project':project,'format':'mp4','resolution':'720p'})
+            except urllib.error.HTTPError as error:return error.code,None
+        with ThreadPoolExecutor(max_workers=6) as executor:results=list(executor.map(submit,range(6)))
+        try:
+            self.assertTrue(all(code in (202,429) for code,_ in results),results)
+            accepted=[job for code,job in results if code==202]
+            self.assertLessEqual(len(accepted),4,'At most one active + three waiting submissions are allowed')
+            jobs=self.request('/api/advertising/jobs')['jobs']
+            self.assertLessEqual(sum(job['status']=='queued' for job in jobs),3)
+            self.assertLessEqual(sum(job['status']=='running' for job in jobs),1)
+        finally:
+            for code,job in results:
+                if code==202:self.request('/api/advertising/jobs/'+job['id'],'DELETE')
+
+    def test_09_failed_job_persistence_never_creates_a_phantom_task(self):
+        for _ in range(50):
+            jobs=self.request('/api/advertising/jobs')['jobs']
+            if self.request('/api/advertising/health')['active'] is None and not any(j['status'] in ('running','queued') for j in jobs):break
+            time.sleep(.1)
+        before={j['id'] for j in jobs}
+        directory=self.worker_data/'jobs';os.chmod(directory,0o500)
+        try:
+            with self.assertRaises(urllib.error.HTTPError):self.request('/api/advertising/jobs','POST',{'project':self.fresh(),'format':'mp4','resolution':'720p'})
+            self.assertEqual({j['id'] for j in self.request('/api/advertising/jobs')['jobs']},before)
+        finally:os.chmod(directory,0o700)

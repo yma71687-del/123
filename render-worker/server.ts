@@ -59,6 +59,18 @@ const cancelers = new Map<string, () => void>();
 const writes = new Map<string, Promise<void>>();
 let active: string | null = null;
 let cachedBundle: Promise<string> | null = null;
+let projectWrites: Promise<unknown> = Promise.resolve();
+let jobSubmissions: Promise<unknown> = Promise.resolve();
+function serializeProject<T>(action: () => Promise<T>): Promise<T> {
+  const next = projectWrites.catch(() => {}).then(action);
+  projectWrites = next;
+  return next;
+}
+function serializeSubmission<T>(action: () => Promise<T>): Promise<T> {
+  const next = jobSubmissions.catch(() => {}).then(action);
+  jobSubmissions = next;
+  return next;
+}
 
 await mkdir(JOBS, { recursive: true, mode: 0o700 });
 async function atomic(path: string, value: unknown) {
@@ -161,7 +173,7 @@ for (const filename of await readdir(JOBS)) {
   try {
     const job = JSON.parse(await readFile(join(JOBS, filename), "utf8")) as Job;
     if (!idPattern.test(job.id) || filename !== job.id + ".json") continue;
-    adSchema.parse(job.project);
+    job.project = adSchema.parse(job.project);
     if (job.status === "running" || job.status === "queued") {
       job.status = "failed";
       job.error = "服务重启中断了上次任务，请重新提交";
@@ -279,8 +291,13 @@ const server = createServer(async (req, res) => {
       return json(res, 200, {
         ok: true,
         service: "nexus-ad-renderer",
-        version: "0.5.0",
+        version: "0.5.2",
         remotion: "4.0.538",
+        projectVersion: 2,
+        capabilities: { captions: true, subtitleImports: ["srt", "vtt"] },
+        storageFreeBytes: await statfs(DATA).then(
+          (disk) => disk.bavail * disk.bsize,
+        ),
         active,
         queued: [...jobs.values()].filter((j) => j.status === "queued").length,
         limits: {
@@ -305,21 +322,37 @@ const server = createServer(async (req, res) => {
       }
     }
     if (path === "/api/advertising/project" && method === "PUT") {
-      const parsed = adSchema.safeParse((await body(req)).project);
+      const incoming = (await body(req)).project;
+      const parsed = adSchema.safeParse(incoming);
       if (!parsed.success)
         return json(res, 422, {
           detail: parsed.error.issues.map((i) => i.message).join("；"),
         });
-      try {
-        adSchema.parse(JSON.parse(await readFile(PROJECT, "utf8")));
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT")
+      return await serializeProject(async () => {
+        let previous: unknown;
+        try {
+          previous = JSON.parse(await readFile(PROJECT, "utf8"));
+          adSchema.parse(previous);
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT")
+            return json(res, 409, {
+              detail: "已有工程损坏，拒绝覆盖；请先保留原文件并恢复备份",
+            });
+        }
+        if (
+          previous &&
+          typeof previous === "object" &&
+          "version" in previous &&
+          previous.version === 2 &&
+          incoming?.version !== 2
+        )
           return json(res, 409, {
-            detail: "已有工程损坏，拒绝覆盖；请先保留原文件并恢复备份",
+            detail:
+              "云端工程已升级为含字幕的 v2，请刷新页面；旧页面不能覆盖新版工程",
           });
-      }
-      await atomic(PROJECT, parsed.data);
-      return json(res, 200, { saved: true });
+        await atomic(PROJECT, parsed.data);
+        return json(res, 200, { saved: true });
+      });
     }
     if (path === "/api/advertising/jobs" && method === "GET")
       return json(res, 200, {
@@ -331,48 +364,51 @@ const server = createServer(async (req, res) => {
         return json(res, 422, {
           detail: parsed.error.issues.map((i) => i.message).join("；"),
         });
-      if ([...jobs.values()].filter((j) => j.status === "queued").length >= 3)
-        return json(res, 429, { detail: "队列已满，请等待或取消任务" });
-      if (jobs.size >= 50)
-        return json(res, 429, {
-          detail: "任务历史已达 50 条，请删除不需要的已完成任务",
-        });
-      const disk = await statfs(DATA);
-      if (disk.bavail * disk.bsize < 1024 ** 3)
-        return json(res, 507, {
-          detail: "可用磁盘不足 1 GB，暂停新渲染以保护已有业务",
-        });
-      let used = 0;
-      for (const j of jobs.values()) {
-        try {
-          used += (await stat(output(j))).size;
-        } catch {
-          /* No output yet. */
+      return await serializeSubmission(async () => {
+        if ([...jobs.values()].filter((j) => j.status === "queued").length >= 3)
+          return json(res, 429, { detail: "队列已满，请等待或取消任务" });
+        if (jobs.size >= 50)
+          return json(res, 429, {
+            detail: "任务历史已达 50 条，请删除不需要的已完成任务",
+          });
+        const disk = await statfs(DATA);
+        if (disk.bavail * disk.bsize < 1024 ** 3)
+          return json(res, 507, {
+            detail: "可用磁盘不足 1 GB，暂停新渲染以保护已有业务",
+          });
+        let used = 0;
+        for (const j of jobs.values()) {
+          try {
+            used += (await stat(output(j))).size;
+          } catch {
+            /* No output yet. */
+          }
         }
-      }
-      if (used > 1024 ** 3)
-        return json(res, 507, {
-          detail: "广告导出已占用超过 1 GB，请先删除不需要的历史任务",
-        });
-      const request = parsed.data;
-      for (const id of request.project.imageAssetIds) await asset(id, "image");
-      if (request.project.music.assetId)
-        await asset(request.project.music.assetId, "audio");
-      const job: Job = {
-        id: randomUUID().replaceAll("-", ""),
-        name: request.project.name,
-        status: "queued",
-        progress: 0,
-        format: request.format,
-        resolution: request.resolution,
-        createdAt: new Date().toISOString(),
-        project: request.project,
-      };
-      jobs.set(job.id, job);
-      await persist(job);
-      json(res, 202, publicJob(job));
-      void pump();
-      return;
+        if (used > 1024 ** 3)
+          return json(res, 507, {
+            detail: "广告导出已占用超过 1 GB，请先删除不需要的历史任务",
+          });
+        const request = parsed.data;
+        for (const id of request.project.imageAssetIds)
+          await asset(id, "image");
+        if (request.project.music.assetId)
+          await asset(request.project.music.assetId, "audio");
+        const job: Job = {
+          id: randomUUID().replaceAll("-", ""),
+          name: request.project.name,
+          status: "queued",
+          progress: 0,
+          format: request.format,
+          resolution: request.resolution,
+          createdAt: new Date().toISOString(),
+          project: request.project,
+        };
+        await persist(job);
+        jobs.set(job.id, job);
+        json(res, 202, publicJob(job));
+        void pump();
+        return;
+      });
     }
     const match = path.match(
       /^\/api\/advertising\/jobs\/([a-f0-9]{32})(\/file)?$/,

@@ -242,6 +242,127 @@
 .reference-audio audio {
   max-width: 100%;
 }
+.ad-captions label {
+  display: grid;
+  gap: 7px;
+  color: #9db9c8;
+  font-size: 12px;
+}
+.ad-captions .check {
+  display: flex;
+  align-items: center;
+  margin: 14px 0;
+}
+.ad-captions input:not([type="checkbox"]),
+.ad-captions select,
+.ad-captions textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #09141e;
+  color: #e3f2f3;
+  border: 1px solid #28404e;
+  border-radius: 7px;
+  padding: 9px;
+  font: inherit;
+  min-width: 0;
+}
+.ad-captions input[type="color"] {
+  height: 37px;
+}
+.ad-three {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+.caption-import-preview {
+  padding: 16px;
+  margin: 14px 0;
+  background: #10282a;
+  border: 1px solid #315c5b;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.caption-lane {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  font-size: 11px;
+  color: #a1c1c6;
+  margin: 7px 0;
+}
+.caption-lane > div {
+  position: relative;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #08131d;
+}
+.caption-lane button,
+.caption-music {
+  position: absolute;
+  display: block;
+  height: 28px;
+  top: 3px;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 4px;
+  border: 1px solid #39667c;
+  background: #183746;
+  font-size: 11px;
+}
+.caption-lane button.selected {
+  border-color: #64f4d5;
+  background: #1b514c;
+}
+.caption-music {
+  left: 0;
+  width: 100%;
+  background: #28324e;
+}
+.caption-music.off {
+  opacity: 0.45;
+}
+.caption-list {
+  max-height: 380px;
+  overflow: auto;
+  margin-top: 15px;
+}
+.caption-cue {
+  display: grid;
+  grid-template-columns: 35px 76px 76px minmax(60px, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #253946;
+}
+.caption-cue.selected {
+  border-color: #64f4d5;
+}
+.caption-cue button {
+  padding: 8px 5px;
+}
+.caption-cue textarea {
+  min-height: 65px;
+  resize: vertical;
+}
+@media (max-width: 700px) {
+  .caption-cue {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .caption-cue textarea {
+    grid-column: 1 / -1;
+  }
+  .ad-captions .ad-two {
+    grid-template-columns: 1fr;
+  }
+}
 @media (max-width: 1150px) {
   .ad-layout {
     grid-template-columns: 220px minmax(0, 1fr);

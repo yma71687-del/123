@@ -72,10 +72,13 @@ def guard_namespace(state, project, occupied):
     if occupied:raise RuntimeError('Docker 项目、网络或数据卷名称已被占用，未修改任何已有服务')
     return False
 
-def resources_available(state):
+def resources_available(state, docker):
     ancestor = state
     while not ancestor.exists():ancestor = ancestor.parent
-    if shutil.disk_usage(ancestor).free < 5*1024**3:raise RuntimeError('可用磁盘不足 5 GB，已停止构建以保护已有业务')
+    driver=run(docker+['info','--format','{{.Driver}}']).strip()
+    minimum=20 if driver=='vfs' else 5
+    if shutil.disk_usage(ancestor).free < minimum*1024**3:
+        raise RuntimeError(f'Docker {driver} 驱动需要至少 {minimum} GiB 可用磁盘，已停止构建以保护已有业务')
     memory = Path('/proc/meminfo')
     if memory.exists():
         available = re.search(r'^MemAvailable:\s+(\d+)',memory.read_text(),re.M)
@@ -199,9 +202,11 @@ def verify_gate(base, password):
     for path in ('health','project'):
         request=urllib.request.Request(base+'/api/advertising/'+path,headers={'Authorization':'Basic '+credential})
         with opener.open(request,timeout=12) as response:value=json.load(response)
-        if path=='health' and (value.get('service')!='nexus-ad-renderer' or value.get('version')!='0.5.0'):
+        if path=='health' and (value.get('service')!='nexus-ad-renderer' or value.get('version')!='0.5.2' or not value.get('capabilities',{}).get('captions')):
             raise RuntimeError('广告渲染服务尚未通过验收')
-        if path=='project' and value.get('project',{}).get('version')!=1:
+        if path=='health' and value.get('storageFreeBytes',0)<1.2*1024**3:
+            raise RuntimeError('构建后可用磁盘不足 1.2 GiB，未发布公网入口；请保留现有数据并检查空间')
+        if path=='project' and value.get('project',{}).get('version')!=2:
             raise RuntimeError('广告工程读取未通过验收')
     request=urllib.request.Request(base+'/api/references/capabilities',headers={'Authorization':'Basic '+credential})
     with opener.open(request,timeout=12) as response:reference=json.load(response)
@@ -240,7 +245,7 @@ def main():
     if args.stop:
         if not owned:raise RuntimeError('没有可停止的本工具部署')
         run(compose+['stop'],visible=True);print('只停止了本工具的 NEXUS 服务；保留工程卷和其他业务。');return
-    resources_available(state)
+    resources_available(state,docker)
     if not owned:check_port(args.port)
     if not owned:state.mkdir(parents=True,exist_ok=False,mode=0o700)
     if lock is None:lock=acquire_lock(state)
@@ -266,7 +271,8 @@ def main():
     if (state/'compose.json').exists() and (state/'compose.json').read_text()!=config:raise RuntimeError('部署配置被改动，未覆盖')
     write_private(state/'compose.json',config)
     print('仅构建固定版本的新 NEXUS 容器；不停止宿主机 Nginx 或其他业务。',flush=True)
-    run(compose+['build','api','web','render'],visible=True)
+    for service in ('api','web','render'):
+        run(compose+['build',service],visible=True)
     run(compose+['up','-d','--no-build','api','web','render','gate'],visible=True)
     wait_gate('http://127.0.0.1:'+str(args.port),password)
     if not before.issubset(running_containers(docker)):raise RuntimeError('原有运行容器状态发生变化，需要检查；未宣称部署成功')
