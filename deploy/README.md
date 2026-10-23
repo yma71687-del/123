@@ -19,7 +19,7 @@ set -euo pipefail
 installer="$(mktemp /tmp/nexus-deploy.XXXXXX.py)"
 trap 'rm -f "$installer"' EXIT
 curl --fail --location --retry 3 \
-  'https://raw.githubusercontent.com/yma71687-del/123/codex/tencent-online-deployment/deploy/tencent_console.py' \
+  'https://raw.githubusercontent.com/yma71687-del/123/ebcadc3b0f6368ab183f51744ce75b5a9c39857a/deploy/tencent_console.py' \
   --output "$installer"
 printf '%s  %s\n' '9d6296e6ebb78c58f8867a2b7332cba8f67095b815aaafc35cb6f83ffae1db62' "$installer" | sha256sum --check -
 python3 "$installer"
