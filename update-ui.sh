@@ -14,7 +14,7 @@ fi
 
 echo "1/4 下载新手友好界面..."
 curl -fLsS --retry 3 --retry-all-errors --connect-timeout 20 "$URL" -o "$TMP"
-if ! grep -q "新手快速开始" "$TMP" || ! grep -q "function beginnerAction" "$TMP"; then
+if ! grep -q "新手快速开始" "$TMP" || ! grep -q "function beginnerAction" "$TMP" || ! grep -q "function bindInlineControls" "$TMP" || ! grep -q "window.addEventListener('error'" "$TMP"; then
   echo "下载的文件未通过内容检查；现有网站未更改。"
   exit 1
 fi
