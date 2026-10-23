@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write frontend/src frontend/index.html vite.config.ts tests/unit",
     "check:format": "prettier --check frontend/src frontend/index.html vite.config.ts tests/unit",
-    "test:unit": "tsx --test tests/unit/*.test.ts"
+    "test:unit": "tsx --test tests/unit/*.test.ts",
+    "build:preview": "tsc --noEmit && node tools/build-preview.mjs"
   },
   "dependencies": {
     "react": "19.2.0",
@@ -23,6 +24,7 @@
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "@types/three": "0.160.0",
+    "esbuild": "0.28.2",
     "prettier": "3.6.2",
     "tsx": "4.20.6",
     "typescript": "5.9.3",

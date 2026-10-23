@@ -1,5 +1,13 @@
 import { History } from "./history";
-import { api, BACKUP_KEY, download, message } from "./io";
+import {
+  api,
+  assetURL,
+  BACKUP_KEY,
+  download,
+  message,
+  prepareAssets,
+} from "./io";
+import { storageLabel } from "./mode";
 import {
   assetKind,
   emptyProject,
@@ -57,7 +65,7 @@ export class Editor {
     dragging: false,
     rendererState: "loading",
     rendererError: "",
-    status: "正在连接云端工程服务…",
+    status: `正在连接${storageLabel}工程服务…`,
     statusType: "",
     canUndo: false,
     canRedo: false,
@@ -169,7 +177,7 @@ export class Editor {
     if (!audio) return;
     const event = this.cue,
       asset = this.state.project.assets.find((a) => a.id === event.assetId),
-      source = asset?.url ?? "";
+      source = asset ? assetURL(asset) : "";
     if ((audio.getAttribute("src") ?? "") !== source) {
       audio.pause();
       if (source) audio.src = source;
@@ -414,6 +422,7 @@ export class Editor {
   }
   async applyProject(input: unknown) {
     const project = normalizeProject(input); // Validate before touching the current document.
+    await prepareAssets(project.assets);
     this.audio?.pause();
     this.history.reset(project);
     this.publish({ selectedId: null, elapsed: 0, playing: false });
@@ -425,7 +434,7 @@ export class Editor {
     try {
       const data = await api<{ project: unknown }>("/api/project");
       await this.applyProject(data.project);
-      this.notify("已读取云端工程与素材引用", "ok");
+      this.notify(`已读取${storageLabel}工程与素材引用`, "ok");
     } catch (error) {
       let raw: string | null = null;
       try {
@@ -436,10 +445,10 @@ export class Editor {
       if (raw) {
         try {
           await this.applyProject(JSON.parse(raw).project);
-          this.notify("云端读取失败，已恢复浏览器备份", "err");
+          this.notify(`${storageLabel}读取失败，已恢复浏览器备份`, "err");
         } catch (backupError) {
           this.notify(
-            "云端读取失败，浏览器备份也无法读取：" +
+            `${storageLabel}读取失败，浏览器备份也无法读取：` +
               message(backupError) +
               "；请保留原备份",
             "err",
@@ -464,14 +473,21 @@ export class Editor {
       } catch {
         /* Cloud save succeeded independently. */
       }
-      this.notify("工程已保存到云端：" + snapshot.project.name, "ok");
+      this.notify(
+        `工程已保存到${storageLabel}：` + snapshot.project.name,
+        "ok",
+      );
     } catch (error) {
       try {
         localStorage.setItem(BACKUP_KEY, JSON.stringify(snapshot));
-        this.notify("云端保存失败，已暂存浏览器：" + message(error), "err");
+        this.notify(
+          `${storageLabel}保存失败，已暂存浏览器：` + message(error),
+          "err",
+        );
       } catch {
         this.notify(
-          "云端及浏览器备份都未保存成功，请立即导出 JSON：" + message(error),
+          `${storageLabel}及浏览器备份都未保存成功，请立即导出 JSON：` +
+            message(error),
           "err",
         );
       }
@@ -486,7 +502,7 @@ export class Editor {
       )
     ) {
       await this.applyProject(emptyProject());
-      this.notify("已创建空白工程；云端旧工程尚未被覆盖", "ok");
+      this.notify(`已创建空白工程；${storageLabel}旧工程尚未被覆盖`, "ok");
     }
   }
   async restoreBackup() {
@@ -495,7 +511,7 @@ export class Editor {
       const raw = localStorage.getItem(BACKUP_KEY);
       if (!raw) throw Error("没有浏览器备份");
       await this.applyProject(JSON.parse(raw).project);
-      this.notify("已恢复浏览器备份，尚未同步到云端", "ok");
+      this.notify(`已恢复浏览器备份，尚未同步到${storageLabel}工程库`, "ok");
     } finally {
       this.publish({ busy: false });
     }

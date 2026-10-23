@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import type { Editor, EditorState } from "./editor";
 import { TEMPLATES, type Project, type SceneObject } from "./schema";
+import { assetURL } from "./io";
 interface RenderObject {
   mesh: THREE.Mesh<
     THREE.BufferGeometry,
@@ -433,7 +434,7 @@ export class SceneView {
     let texture: THREE.Texture;
     if (record.kind === "image") {
       const asset = project.assets.find((a) => a.id === record.assetId)!;
-      texture = await new THREE.TextureLoader().loadAsync(asset.url);
+      texture = await new THREE.TextureLoader().loadAsync(assetURL(asset));
     } else {
       const canvas = document.createElement("canvas");
       canvas.width = 1024;

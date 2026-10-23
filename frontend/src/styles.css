@@ -113,6 +113,13 @@ h1 {
 .global-status.ok {
   color: #9cecd3;
 }
+.offline-note {
+  padding: 14px 22px;
+  color: #c3ecf8;
+  background: #153044;
+  border-bottom: 1px solid #2c6078;
+  line-height: 1.7;
+}
 .global-status.err {
   background: #391c29;
   color: #ffc4cd;

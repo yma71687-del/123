@@ -12,3 +12,4 @@ dist/
 .local-data/
 .test-results/
 playwright-report/
+preview-dist/

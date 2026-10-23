@@ -5,6 +5,7 @@ import { Library } from "./components/Library";
 import { Inspector } from "./components/Inspector";
 import { Timeline } from "./components/Timeline";
 import { Button } from "./components/controls";
+import { OFFLINE_PREVIEW, storageLabel } from "./mode";
 const editor = new Editor();
 export function App() {
   const state = useSyncExternalStore(editor.subscribe, editor.snapshot);
@@ -72,7 +73,12 @@ export function App() {
           <div className="logo">N</div>
           <div>
             <h1>NEXUS FX STUDIO</h1>
-            <div className="sub">CLOUD CREATIVE SUITE · BUILD 0.4.0</div>
+            <div className="sub">
+              {OFFLINE_PREVIEW
+                ? "OFFLINE INTERACTIVE PREVIEW"
+                : "CLOUD CREATIVE SUITE"}{" "}
+              · BUILD 0.4.0
+            </div>
           </div>
         </div>
         <div className="top-actions">
@@ -130,10 +136,17 @@ export function App() {
             disabled={disabled}
             onClick={() => editor.run(() => editor.save())}
           >
-            保存到云端
+            保存到{storageLabel}
           </Button>
         </div>
       </header>
+      {OFFLINE_PREVIEW && (
+        <div className="offline-note" role="note">
+          离线试用：工程与素材仅保存在当前浏览器。可体验对象编辑、时间轴、音效和无声预览；云端与
+          AI 服务未连接。请使用电脑 Chrome／Edge
+          的普通浏览模式，保留此文件与浏览器数据。
+        </div>
+      )}
       <div
         id="status"
         className={"global-status " + state.statusType}
