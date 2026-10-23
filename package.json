@@ -12,12 +12,23 @@
     "format": "prettier --write frontend/src frontend/index.html vite.config.ts tests/unit",
     "check:format": "prettier --check frontend/src frontend/index.html vite.config.ts tests/unit",
     "test:unit": "tsx --test tests/unit/*.test.ts",
-    "build:preview": "tsc --noEmit && node tools/build-preview.mjs"
+    "build:preview": "tsc --noEmit && node tools/build-preview.mjs",
+    "studio": "remotion studio video/index.ts --no-open",
+    "render:worker": "tsx render-worker/server.ts",
+    "build:render-worker": "node tools/build_render_worker.mjs",
+    "generate:audio": "python3 tools/generate_ad_audio.py"
   },
   "dependencies": {
+    "@remotion/bundler": "4.0.538",
+    "@remotion/cli": "4.0.538",
+    "@remotion/media": "4.0.538",
+    "@remotion/player": "4.0.538",
+    "@remotion/renderer": "4.0.538",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "three": "0.160.0"
+    "remotion": "4.0.538",
+    "three": "0.160.0",
+    "zod": "4.5.4"
   },
   "devDependencies": {
     "@types/node": "24.10.0",

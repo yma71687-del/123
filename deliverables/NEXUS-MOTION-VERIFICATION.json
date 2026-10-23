@@ -1,0 +1,34 @@
+{
+  "feature_release": "0.5.0",
+  "sample": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1920,
+        "height": 1080,
+        "side_data_list": [
+          {}
+        ]
+      },
+      {
+        "codec_name": "aac",
+        "codec_type": "audio"
+      }
+    ],
+    "format": {
+      "duration": "15.019000",
+      "size": "3339756"
+    }
+  },
+  "render_seconds": 53.293,
+  "audio_mean_db": -31.9,
+  "audio_peak_db": -8.8,
+  "sha256": {
+    "NEXUS-MOTION-SHOWCASE-1080p.mp4": "e6ba470b5d9e88fb8f419d07463973883868099b627877e4622f911a15bbe420",
+    "NEXUS-MOTION-PROJECT.json": "6496a64ecee11250ab208444c09e68c8365ec10d813132b59faf894b9eba2da6",
+    "NEXUS-MOTION-COVER.png": "0673e5b8ca42123bdada1ba23fb07706bc434fd3c7667e298e43d470e67bd69d"
+  }
+}

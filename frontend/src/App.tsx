@@ -1,4 +1,11 @@
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { Editor } from "./editor";
 import { message } from "./io";
 import { Library } from "./components/Library";
@@ -7,7 +14,31 @@ import { Timeline } from "./components/Timeline";
 import { Button } from "./components/controls";
 import { OFFLINE_PREVIEW, storageLabel } from "./mode";
 const editor = new Editor();
+const Advertising = OFFLINE_PREVIEW
+  ? () => null
+  : lazy(() =>
+      import("./Advertising").then((module) => ({
+        default: module.Advertising,
+      })),
+    );
 export function App() {
+  const [advertising, setAdvertising] = useState(
+    location.hash === "#advertising",
+  );
+  useEffect(() => {
+    const update = () => setAdvertising(location.hash === "#advertising");
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
+  return !OFFLINE_PREVIEW && advertising ? (
+    <Suspense fallback={<p>正在打开广告动效工作台…</p>}>
+      <Advertising />
+    </Suspense>
+  ) : (
+    <SceneEditor />
+  );
+}
+function SceneEditor() {
   const state = useSyncExternalStore(editor.subscribe, editor.snapshot);
   const canvas = useRef<HTMLCanvasElement>(null),
     audio = useRef<HTMLAudioElement>(null),
@@ -82,6 +113,11 @@ export function App() {
           </div>
         </div>
         <div className="top-actions">
+          {!OFFLINE_PREVIEW && (
+            <a className="ad-back" href="#advertising">
+              广告动效工作台
+            </a>
+          )}
           <Button
             action="toggle-mode"
             id="modeBtn"

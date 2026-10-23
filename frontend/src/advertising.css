@@ -1,0 +1,224 @@
+.ad-workbench {
+  max-width: 2100px;
+  margin: auto;
+  padding: 0 22px 35px;
+}
+.ad-header {
+  padding: 26px 0;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  border: none;
+}
+.ad-header h1 {
+  font-size: 28px;
+  margin: 9px 0 0;
+}
+.ad-eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #76e5d0;
+}
+.ad-back {
+  display: inline-block;
+  padding: 10px 14px;
+  border: 1px solid #315a68;
+  border-radius: 8px;
+  color: #b7f1e7;
+  text-decoration: none;
+  font-size: 13px;
+}
+.ad-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(380px, 1fr) 285px;
+  gap: 18px;
+  margin-top: 20px;
+  align-items: start;
+}
+.ad-form {
+  padding: 19px;
+  display: grid;
+  gap: 13px;
+}
+.ad-form h2 {
+  margin: 15px 0 2px;
+}
+.ad-form label,
+.ad-audio label {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  color: #9db9c8;
+}
+.ad-form input,
+.ad-form textarea,
+.ad-form select,
+.ad-audio input,
+.ad-audio select {
+  width: 100%;
+  box-sizing: border-box;
+  background: #09141e;
+  color: #e3f2f3;
+  border: 1px solid #28404e;
+  border-radius: 7px;
+  padding: 9px;
+  font: inherit;
+}
+.ad-form input[type="color"] {
+  height: 42px;
+}
+.ad-template {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 7px;
+  padding: 15px 12px;
+  background: #0c1822;
+  border: 1px solid #233b48;
+}
+.ad-template small {
+  font-size: 11px;
+  line-height: 1.65;
+  color: #7899a9;
+}
+.ad-template.selected {
+  background: #102c2d;
+  border-color: #64f4d5;
+}
+.ad-center {
+  display: grid;
+  gap: 18px;
+}
+.ad-center .panel {
+  padding: 20px;
+}
+.ad-player {
+  margin: 15px 0;
+  overflow: hidden;
+  border-radius: 9px;
+  min-width: 0;
+  background: #060d13;
+}
+.checker {
+  background-color: #242d32;
+  background-image:
+    linear-gradient(45deg, #364047 25%, transparent 25%),
+    linear-gradient(-45deg, #364047 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #364047 75%),
+    linear-gradient(-45deg, transparent 75%, #364047 75%);
+  background-size: 24px 24px;
+  background-position:
+    0 0,
+    0 12px,
+    12px -12px,
+    -12px 0;
+}
+.ad-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 12px 0 20px;
+}
+.ad-cue {
+  display: grid;
+  grid-template-columns: 1.3fr 0.65fr 1.1fr auto;
+  gap: 12px;
+  align-items: end;
+  padding: 12px 0;
+  border-top: 1px solid #243743;
+}
+.ad-audio .check {
+  display: flex;
+  align-items: center;
+}
+.ad-audio .check input {
+  width: auto;
+}
+.ad-cue input[type="range"] {
+  padding: 0;
+}
+.ad-job {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid #253946;
+  padding: 15px 0;
+}
+.ad-job > div {
+  flex: 1;
+  min-width: 170px;
+}
+.ad-job small {
+  display: block;
+  color: #7a9caa;
+  margin-top: 7px;
+}
+.ad-job progress {
+  max-width: 120px;
+  accent-color: #64f4d5;
+}
+.ad-job-error {
+  width: 100%;
+  color: #ffb8a4;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.ad-form button:disabled {
+  opacity: 0.45;
+}
+.ad-workbench .global-status {
+  position: static;
+}
+.ad-workbench h2 {
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+.ad-workbench h3 {
+  font-size: 13px;
+}
+.ad-workbench .muted {
+  line-height: 1.7;
+  font-size: 12px;
+}
+@media (max-width: 1150px) {
+  .ad-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .ad-layout > aside:last-child {
+    grid-column: 1/-1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ad-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (max-width: 700px) {
+  .ad-workbench {
+    padding: 0 12px 20px;
+  }
+  .ad-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .ad-layout > * {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .ad-layout > aside:last-child {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .ad-header h1 {
+    font-size: 23px;
+  }
+  .ad-cue {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ad-two {
+    grid-template-columns: 1fr;
+  }
+}

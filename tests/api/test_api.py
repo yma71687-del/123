@@ -31,6 +31,9 @@ class API(unittest.TestCase):
         response=self.client.get('/api/project');self.assertEqual(response.status_code,200)
         self.assertEqual(response.json()['project']['version'],4)
         self.assertEqual(self.client.get('/api/health').json()['version'],'0.4.0')
+    def test_unconfigured_ad_worker_is_explicit_and_internal_paths_are_private(self):
+        self.assertEqual(self.client.get('/api/advertising/health').status_code,503)
+        self.assertEqual(self.client.get('/api/advertising/assets/'+'a'*32).status_code,404)
     def test_asset_metadata_survives_new_client(self):
         response=self.upload();self.assertEqual(response.status_code,200);asset=response.json()
         self.assertEqual(asset['name'],'产品图.png')

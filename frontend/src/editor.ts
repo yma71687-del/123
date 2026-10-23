@@ -53,6 +53,7 @@ export class Editor {
   private disposed = false;
   private generation = 0;
   private audioBlocked = false;
+  private bootedOnce = false;
   state: EditorState = {
     project: this.history.current,
     selectedId: null,
@@ -142,7 +143,15 @@ export class Editor {
       );
     }
     if (generation !== this.generation) return;
-    await this.load();
+    if (!this.bootedOnce) {
+      await this.load();
+      this.bootedOnce = true;
+    } else {
+      this.syncAudio(true);
+      await this.scene?.settled();
+      this.publish({ busy: false, playing: false });
+      this.notify("已恢复当前 3D 工作区；未保存的修改仍保留", "ok");
+    }
   }
   dispose() {
     this.disposed = true;

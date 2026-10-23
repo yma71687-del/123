@@ -162,7 +162,7 @@ def compose_config(source, project, port):
     return {'services':{
         'api':{**limits,'image':project+'-api:'+SOURCE[:12],'build':str(source/'backend'),'environment':{'DATA_DIR':'/data'},'volumes':['nexus_data:/data'],'mem_limit':'256m','cpus':.5},
         'web':{**limits,'image':project+'-web:'+SOURCE[:12],'build':{'context':str(source),'dockerfile':'Dockerfile.web'},'depends_on':['api'],'mem_limit':'128m','cpus':.5},
-        'gate':{**limits,'image':CADDY_IMAGE,'environment':{'NEXUS_USER':'${NEXUS_USER}','NEXUS_PASSWORD_HASH':'${NEXUS_PASSWORD_HASH}'},'volumes':[str(source/'Caddyfile')+':/etc/caddy/Caddyfile:ro'],'ports':[f'127.0.0.1:{port}:80'],'depends_on':['web'],'mem_limit':'128m','cpus':.5},
+        'gate':{**limits,'image':CADDY_IMAGE,'environment':{'NEXUS_USER':'${NEXUS_USER}','NEXUS_PASSWORD_HASH':'${NEXUS_PASSWORD_HASH}','NO_PROXY':'localhost,127.0.0.1,api,web,gate,render'},'volumes':[str(source/'Caddyfile')+':/etc/caddy/Caddyfile:ro'],'ports':[f'127.0.0.1:{port}:80'],'depends_on':['web'],'mem_limit':'128m','cpus':.5},
         'tunnel':{**limits,'image':TUNNEL_IMAGE,'command':['tunnel','--no-autoupdate','--protocol','http2','--edge-ip-version','4','--url','http://gate:80'],'depends_on':['gate'],'mem_limit':'256m','cpus':.5},
     },'volumes':{'nexus_data':{'name':project+'_data','labels':{'nexus.owner':OWNER}}}}
 

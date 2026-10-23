@@ -55,6 +55,18 @@ jobs:
         env:
           PLAYWRIGHT_USE_BUNDLED: '1'
         run: .venv/bin/python -m unittest discover -s tests/deployment -v
+      - name: Actual advertising browser, audio timing, alpha codecs and batch regressions
+        env:
+          PLAYWRIGHT_USE_BUNDLED: '1'
+        run: .venv/bin/python -m unittest discover -s tests/advertising -v
+      - name: Actual isolated authenticated advertising Docker stack
+        env:
+          PLAYWRIGHT_USE_BUNDLED: '1'
+        run: |
+          docker tag nexus-fx-review-api:0.4.0 nexus-fx-ad-api:0.5.0
+          docker tag nexus-fx-review-web:0.4.0 nexus-fx-ad-web:0.5.0
+          docker build -f Dockerfile.render -t nexus-ad-renderer:0.5.0 .
+          .venv/bin/python tests/advertising/docker_stack.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

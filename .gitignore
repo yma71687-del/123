@@ -13,3 +13,6 @@ dist/
 .test-results/
 playwright-report/
 preview-dist/
+.ad-data/
+render-worker/dist/
+video/out/

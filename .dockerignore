@@ -10,3 +10,5 @@ data
 uploads
 __pycache__
 *.pyc
+.ad-data
+render-worker/dist

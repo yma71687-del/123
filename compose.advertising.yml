@@ -1,0 +1,28 @@
+# Use only with a separately named NEXUS project; never run in an unrelated stack.
+services:
+  api:
+    environment:
+      NEXUS_AD_SERVICE: http://render:8010
+  render:
+    environment:
+      NO_PROXY: localhost,127.0.0.1,api,web,gate,render
+    build:
+      context: .
+      dockerfile: Dockerfile.render
+    restart: unless-stopped
+    init: true
+    shm_size: 256m
+    mem_limit: 1536m
+    cpus: 1.0
+    volumes:
+      - ad_data:/ad-data
+      - nexus_data:/source-data:ro
+    expose:
+      - "8010"
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "3"
+volumes:
+  ad_data:

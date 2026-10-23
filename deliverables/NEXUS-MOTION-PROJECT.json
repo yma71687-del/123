@@ -1,0 +1,52 @@
+{
+  "project": {
+    "version": 1,
+    "name": "NEXUS / 科技品牌广告",
+    "template": "showcase",
+    "headline": "让创意，成为信号",
+    "tagline": "NEXUS FX STUDIO · MOTION SYSTEM",
+    "accent": "#64f4d5",
+    "duration": 15,
+    "speed": 1,
+    "radius": 1,
+    "labels": [
+      "创意",
+      "影像",
+      "品牌",
+      "设计",
+      "声音",
+      "光影",
+      "动效",
+      "未来"
+    ],
+    "imageAssetIds": [],
+    "values": [
+      36,
+      58,
+      74,
+      96
+    ],
+    "music": {
+      "enabled": true,
+      "gain": 0.25,
+      "assetId": null
+    },
+    "sfx": [
+      {
+        "type": "whoosh",
+        "time": 0.2,
+        "gain": 0.5
+      },
+      {
+        "type": "impact",
+        "time": 5,
+        "gain": 0.45
+      },
+      {
+        "type": "whoosh",
+        "time": 10,
+        "gain": 0.4
+      }
+    ]
+  }
+}

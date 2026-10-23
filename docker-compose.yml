@@ -23,6 +23,7 @@ services:
     environment:
       NEXUS_USER: ${NEXUS_USER}
       NEXUS_PASSWORD_HASH: ${NEXUS_PASSWORD_HASH}
+      NO_PROXY: localhost,127.0.0.1,api,web,gate,render
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

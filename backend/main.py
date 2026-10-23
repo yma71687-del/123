@@ -5,10 +5,15 @@ import re
 import tempfile
 import threading
 import uuid
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
+from starlette.background import BackgroundTask
+from starlette.concurrency import run_in_threadpool
 from pydantic import ValidationError
 from models import Project, ProjectPayload
 
@@ -21,6 +26,7 @@ PROJECT_FILE = DATA_DIR / 'project.json'
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 ALLOWED_PREFIXES = ('image/', 'audio/', 'video/')
 PROJECT_LOCK = threading.RLock()
+AD_SERVICE = os.getenv('NEXUS_AD_SERVICE', '').rstrip('/')
 
 
 def atomic_json(path: Path, value):
@@ -60,6 +66,38 @@ def asset_metadata(path):
 @app.get('/api/health')
 def health():
     return {'ok':True, 'service':'nexus-fx-studio', 'version':'0.4.0'}
+
+
+@app.api_route('/api/advertising/{path:path}', methods=['GET','PUT','POST','DELETE'])
+async def advertising_proxy(path: str, request: Request):
+    # Only these same-origin routes are exposed. The caller never supplies a host,
+    # a filesystem path or the render worker's internal media-serving endpoint.
+    if not re.fullmatch(r'health|project|jobs(?:/[a-f0-9]{32}(?:/file)?)?', path):
+        raise HTTPException(404, 'Advertising route not found')
+    if not AD_SERVICE:
+        raise HTTPException(503, '广告渲染服务尚未启动；工程可先导出到本机')
+    payload = bytearray()
+    async for chunk in request.stream():
+        payload.extend(chunk)
+        if len(payload)>128*1024:
+            raise HTTPException(413, 'Advertising request exceeds 128 KB')
+    target = AD_SERVICE+'/api/advertising/'+path
+    outgoing = urllib.request.Request(target, data=bytes(payload) if payload else None,
+        method=request.method, headers={'Content-Type':'application/json'})
+    try:
+        # Internal service requests must not pass through an outbound HTTP proxy.
+        opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        response=await run_in_threadpool(opener.open,outgoing,timeout=15)
+    except urllib.error.HTTPError as error:
+        response=error
+    except OSError as error:
+        raise HTTPException(503, '广告渲染服务无法连接，请检查服务状态') from error
+    headers={key:response.headers[key] for key in ('Content-Type','Content-Length','Content-Disposition','Cache-Control','X-Content-Type-Options') if key in response.headers}
+    def chunks():
+        try:
+            while data:=response.read(65536):yield data
+        finally:response.close()
+    return StreamingResponse(chunks(),status_code=response.status,headers=headers,background=BackgroundTask(response.close))
 
 
 @app.get('/api/project')

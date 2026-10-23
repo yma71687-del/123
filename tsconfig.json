@@ -11,5 +11,5 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["frontend/src", "vite.config.ts", "tests/unit"]
+  "include": ["frontend/src", "video", "render-worker", "vite.config.ts", "tests/unit"]
 }

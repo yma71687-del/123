@@ -1,0 +1,18 @@
+FROM node:24-bookworm-slim
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY video ./video
+COPY render-worker ./render-worker
+COPY frontend/public ./frontend/public
+COPY tools/build_render_worker.mjs ./tools/build_render_worker.mjs
+COPY tsconfig.json ./
+RUN --mount=type=secret,id=build_ca,mode=0444,required=false \
+    apt-get update && apt-get install -y --no-install-recommends chromium fonts-noto-cjk ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && if [ -f /run/secrets/build_ca ]; then npm ci --ignore-scripts --cafile=/run/secrets/build_ca; \
+    else npm ci --ignore-scripts; fi \
+    && node tools/build_render_worker.mjs && mkdir /ad-data && chown -R node:node /ad-data /app
+USER node
+ENV AD_HOST=0.0.0.0 AD_PORT=8010 AD_DATA_DIR=/ad-data NEXUS_ASSET_DIR=/source-data/assets CHROME_EXECUTABLE=/usr/bin/chromium NODE_OPTIONS=--max-old-space-size=512
+EXPOSE 8010
+CMD ["node","render-worker/dist/server.mjs"]
