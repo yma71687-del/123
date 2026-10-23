@@ -118,11 +118,11 @@ function bindInlineControls(){
         try{
           const clickInput=expr.match(/^document\.getElementById\('([^']+)'\)\.click\(\)$/);
           if(clickInput){const target=document.getElementById(clickInput[1]);if(target)target.click();return;}
-          const call=expr.match(/^([A-Za-z_$][\\w$]*)\((.*)\)$/);
+          const call=expr.match(/^([A-Za-z_$][\w$]*)\((.*)\)$/);
           if(!call){showRuntimeNotice('暂不支持的控件操作：'+expr);return;}
           const name=call[1],raw=call[2].trim(),args=[];
           if(raw){
-            const parts=raw.match(/'(?:[^'\\\\]|\\\\.)*'|"(?:[^"\\\\]|\\\\.)*"|this(?:\\.value)?|[^,]+/g)||[];
+            const parts=raw.split(',').map(part=>part.trim());
             for(const part0 of parts){
               const part=part0.trim();
               if(part==='this')args.push(el);
