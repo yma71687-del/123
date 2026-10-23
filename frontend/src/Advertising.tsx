@@ -10,6 +10,7 @@ import {
 import { api, download } from "./io";
 import type { Asset } from "./schema";
 import "./advertising.css";
+import { ReferenceAnalysis } from "./ReferenceAnalysis";
 
 type Job = {
   id: string;
@@ -371,6 +372,7 @@ export function Advertising() {
           </button>
         </aside>
         <main className="ad-center">
+          <ReferenceAnalysis />
           <section className="panel ad-preview">
             <div className="timehead">
               <h2>实时动画与声音预览</h2>

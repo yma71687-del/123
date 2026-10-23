@@ -1,5 +1,7 @@
 # NEXUS FX STUDIO
 
+**0.5.1 新增：[参考视频解析入口](docs/REFERENCE_ANALYSIS.md)**。广告工作台支持真实视频上传、带时间点抽帧、中英文 OCR、音轨试听及内嵌字幕提取。聊天附件超限的第二份参考片仍未读到；本功能不等同于语音转写或自动复刻。
+
 **新增：广告动效工作台 0.5 扩展**。已接入真实 Remotion 预览、四种广告模板、产品图片、音乐／逐条音效、云端广告工程保存、三条批量套模板、带声 MP4 与透明 WebM／ProRes 渲染。见 [操作与范围](docs/ADVERTISING.md)、[实际 1080p 样片](deliverables/NEXUS-MOTION-SHOWCASE-1080p.mp4?raw=true)、[测试记录](docs/TEST_REPORT_ADVERTISING.md)。本地完整 Docker 链路已测试，腾讯云尚未部署验收；第二个参考视频超过读取上限，未核实其全部技能。
 
 **新版线上部署：[自动生成密码的控制台命令](deploy/ADVERTISING.md)** · **[广告动效统一交付包](deliverables/NEXUS-AD-STUDIO-0.5.0-source.zip?raw=true)**。固定版本源码、真实样片和可导入工程已打包；使用独立实例保留旧业务。

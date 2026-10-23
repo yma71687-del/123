@@ -12,7 +12,7 @@ console=importlib.util.module_from_spec(spec);spec.loader.exec_module(console)
 
 class AdvertisingInstaller(unittest.TestCase):
     def test_fixed_release_extract_retry_and_local_change_preservation(self):
-        archive=(ROOT/'deliverables/NEXUS-AD-STUDIO-0.5.0-source.zip').read_bytes()
+        archive=(ROOT/'deliverables'/console.RELEASE_URL.rsplit('/',1)[-1]).read_bytes()
         with tempfile.TemporaryDirectory() as tmp:
             state=Path(tmp)
             with patch.object(console.urllib.request,'urlopen',side_effect=lambda *a,**kw:io.BytesIO(archive)):

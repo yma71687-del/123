@@ -6,7 +6,7 @@ uploads/
 data/
 __pycache__/
 *.py[cod]
-node_modules/
+node_modules
 dist/
 .venv/
 .local-data/

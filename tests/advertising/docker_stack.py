@@ -10,6 +10,9 @@ import subprocess
 import struct
 import tempfile
 import uuid
+import urllib.parse
+import urllib.request
+import time
 from playwright.sync_api import sync_playwright
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -42,6 +45,8 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             page.get_by_role('button',name='保存到云端',exact=True).click()
             page.wait_for_function("()=>document.querySelector('[role=status]')?.textContent.includes('保存到云端')")
             page.get_by_test_id('ad-render').click()
+            page.wait_for_function('()=>document.querySelector("[data-testid=ad-job]") || document.querySelector(".global-status.err")')
+            assert page.get_by_test_id('ad-job').count(),page.locator('.global-status').inner_text()
             page.wait_for_selector('[data-testid=ad-job] a',timeout=180000)
             with page.expect_download() as download:page.locator('[data-testid=ad-job] a').first.click()
             output=ROOT/'.test-results/advertising/docker-render.mp4';output.parent.mkdir(parents=True,exist_ok=True);download.value.save_as(output)
@@ -50,10 +55,38 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             assert abs(float(probe['format']['duration'])-4)<.2
             pcm=subprocess.check_output(['ffmpeg','-v','error','-i',str(output),'-vn','-ac','1','-ar','8000','-f','s16le','pipe:1'])
             assert max(abs(v) for v in struct.unpack('<'+'h'*(len(pcm)//2),pcm))>300
+            # Exercise the actual Nginx streaming upload and FFmpeg/Chinese OCR
+            # binaries inside the API's unchanged 256 MB / 0.5 CPU limits.
+            import base64
+            auth_header='Basic '+base64.b64encode(('nexus:'+password).encode()).decode()
+            def reference_request(path, data=None):
+                req=urllib.request.Request(base+path, data=data,
+                    headers={'Authorization':auth_header,'Content-Type':'application/octet-stream'})
+                with urllib.request.urlopen(req,timeout=20) as response:return json.load(response)
+            cap=reference_request('/api/references/capabilities')
+            assert 'chi_sim' in cap['ocrLanguages'],cap
+            # A valid MP4 free box pushes this synthetic fixture above the
+            # chat attachment limit, proving the separate browser upload path.
+            free_size=33*1024*1024
+            payload=output.read_bytes()+struct.pack('>I4s',free_size,b'free')+bytes(free_size-8)
+            reference=reference_request('/api/references?filename='+urllib.parse.quote('广告参考样片.mp4'),payload)
+            assert reference['size']==len(payload)>32*1024*1024
+            for _ in range(240):
+                reference=reference_request('/api/references/'+reference['id'])
+                if reference['status'] in ('done','failed'):break
+                time.sleep(.5)
+            assert reference['status']=='done',reference
+            assert len(reference['report']['audio'])==1
+            assert reference['report']['transcription']['status']=='not-connected'
+            assert reference['report']['frames']
+            page.reload();page.wait_for_selector('[data-testid=reference-job]')
+            page.get_by_role('button',name='广告参考样片.mp4',exact=True).click()
+            page.wait_for_selector('[data-testid=reference-report] img')
+            page.wait_for_function('()=>{const image=document.querySelector("[data-testid=reference-report] img");return image?.complete && image.naturalWidth>0;}')
             page.screenshot(path=str(output.parent/'docker-workbench.png'),full_page=True)
             assert errors==[],errors
             context.close();browser.close()
         assert before.issubset(console.running_containers(['docker']))
-        print('PASS: real Caddy login, Nginx CSP, Python proxy, Node/Chromium container, project save and audible MP4 download')
+        print('PASS: real Caddy login, Nginx CSP, project save, audible MP4, streamed reference upload, Chinese OCR and frame/audio extraction in limited API container')
     finally:
         subprocess.run(command+['down','-v','--remove-orphans'],capture_output=True,text=True,check=True)

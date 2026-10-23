@@ -16,6 +16,7 @@ from starlette.background import BackgroundTask
 from starlette.concurrency import run_in_threadpool
 from pydantic import ValidationError
 from models import Project, ProjectPayload
+from reference_routes import create_router
 
 app = FastAPI(title='NEXUS FX STUDIO API', version='0.4.0')
 DATA_DIR = Path(os.getenv('DATA_DIR', '/data')).resolve()
@@ -27,6 +28,7 @@ MAX_UPLOAD_BYTES = 50 * 1024 * 1024
 ALLOWED_PREFIXES = ('image/', 'audio/', 'video/')
 PROJECT_LOCK = threading.RLock()
 AD_SERVICE = os.getenv('NEXUS_AD_SERVICE', '').rstrip('/')
+app.include_router(create_router(DATA_DIR))
 
 
 def atomic_json(path: Path, value):

@@ -182,6 +182,66 @@
   line-height: 1.7;
   font-size: 12px;
 }
+.reference-job {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #253946;
+  font-size: 12px;
+}
+.reference-job > button:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.reference-job [aria-pressed="true"] {
+  border-color: #64f4d5;
+}
+.reference-error {
+  color: #ffb8a4;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.reference-frames {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+  max-height: 520px;
+  overflow: auto;
+  align-items: start;
+}
+.reference-frames figure {
+  min-width: 0;
+  margin: 0;
+  background: #09141e;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.reference-frames img {
+  display: block;
+  width: 100%;
+}
+.reference-frames figcaption {
+  padding: 10px;
+  font-size: 11px;
+}
+.reference-frames pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 180px;
+  overflow: auto;
+  color: #9db9c8;
+}
+.reference-audio {
+  margin-top: 14px;
+}
+.reference-audio audio {
+  max-width: 100%;
+}
 @media (max-width: 1150px) {
   .ad-layout {
     grid-template-columns: 220px minmax(0, 1fr);
