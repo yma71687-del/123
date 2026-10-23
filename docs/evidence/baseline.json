@@ -1,0 +1,22 @@
+{
+  "baselineCommit": "b29038057282f6bc8c3f5afa045fcdff6c900b0a",
+  "pausedSceneChanges": true,
+  "afterReload": {
+    "objects": 0,
+    "clientAssets": 0
+  },
+  "storedAssets": 1,
+  "audioAtTimelineStart": {
+    "timeline": 0.15000000000000002,
+    "cue": 5,
+    "paused": false,
+    "currentTime": 0.099586
+  },
+  "cdnFailure": {
+    "three": "undefined",
+    "mode": "professional",
+    "notice": "操作失败：Cannot read properties of undefined (reading 'fog')",
+    "canvasWidth": 300
+  },
+  "interpretation": "Local reproduction against the recorded baseline commit; not a production browser diagnosis. The same-version Three.js diagnostic fixture restored rendering."
+}

@@ -1,0 +1,21 @@
+{
+  "name": "nexus-fx-studio",
+  "version": "0.3.1",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node tools/build-vendor.mjs",
+    "format": "prettier --write frontend/*.js frontend/styles.css frontend/index.html",
+    "check:format": "prettier --check frontend/*.js frontend/styles.css frontend/index.html",
+    "test:unit": "node --test tests/unit/*.test.js"
+  },
+  "dependencies": {
+    "three": "0.160.0"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  },
+  "type": "module"
+}

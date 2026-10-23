@@ -8,3 +8,7 @@ __pycache__/
 *.py[cod]
 node_modules/
 dist/
+.venv/
+.local-data/
+.test-results/
+playwright-report/
