@@ -29,8 +29,8 @@ class API(unittest.TestCase):
         return self.client.post('/api/assets/upload',files={'file':(name,data,mime)})
     def test_default_project_contract(self):
         response=self.client.get('/api/project');self.assertEqual(response.status_code,200)
-        self.assertEqual(response.json()['project']['version'],3)
-        self.assertEqual(self.client.get('/api/health').json()['version'],'0.3.1')
+        self.assertEqual(response.json()['project']['version'],4)
+        self.assertEqual(self.client.get('/api/health').json()['version'],'0.4.0')
     def test_asset_metadata_survives_new_client(self):
         response=self.upload();self.assertEqual(response.status_code,200);asset=response.json()
         self.assertEqual(asset['name'],'产品图.png')
@@ -41,13 +41,13 @@ class API(unittest.TestCase):
             self.assertEqual(binary.headers['x-content-type-options'],'nosniff')
     def test_full_project_round_trip(self):
         asset=self.upload().json();text_id='c'*32
-        project={'version':3,'name':'可恢复广告','template':'holo','aspect':'2.39:1','duration':12,'assets':[asset],'objects':[{'id':'b'*32,'kind':'image','assetId':asset['id'],'x':-1,'y':.5,'z':0,'width':1,'height':1},{'id':text_id,'kind':'text','text':'品牌标题','x':0,'y':-1,'z':.2,'width':2,'height':.5}],'keyframes':[{'t':1,'scale':1.5,'color':'#123456'}]}
+        project={'version':4,'name':'可恢复广告','template':'holo','aspect':'2.39:1','duration':12,'assets':[asset],'objects':[{'id':'b'*32,'kind':'image','assetId':asset['id'],'x':-1,'y':.5,'z':0,'width':1,'height':1},{'id':text_id,'kind':'text','text':'品牌标题','x':0,'y':-1,'z':.2,'width':2,'height':.5}],'keyframes':[{'t':1,'scale':1.5,'color':'#123456'}]}
         response=self.client.put('/api/project',json={'project':project});self.assertEqual(response.status_code,200)
         stored=self.client.get('/api/project').json()['project'];self.assertEqual(stored['objects'][0]['assetId'],asset['id']);self.assertEqual(stored['objects'][1]['text'],'品牌标题');self.assertEqual(stored['keyframes'],project['keyframes'])
     def test_invalid_project_never_overwrites(self):
         self.client.put('/api/project',json={'project':{'name':'保留版本'}})
         original=self.module.PROJECT_FILE.read_bytes()
-        for invalid in ({'version':4},{'duration':-1},{'aspect':'9:16'},{'object':{'scale':100}},{'objects':[{'id':'d'*32,'kind':'image','assetId':'e'*32}]},{'audioEvents':[{'time':99,'volume':.5}]}):
+        for invalid in ({'version':99},{'duration':-1},{'aspect':'9:16'},{'object':{'scale':100}},{'objects':[{'id':'d'*32,'kind':'image','assetId':'e'*32}]},{'audioEvents':[{'time':99,'volume':.5}]}):
             with self.subTest(invalid=invalid):self.assertEqual(self.client.put('/api/project',json={'project':invalid}).status_code,422)
         self.assertEqual(self.module.PROJECT_FILE.read_bytes(),original)
     def test_legacy_image_reference_migration(self):
@@ -88,3 +88,26 @@ class API(unittest.TestCase):
             payload={'project':{'assets':[asset],'audioEvents':[event]}}
             self.assertEqual(self.client.put('/api/project',json=payload).status_code,200)
             self.assertEqual(self.client.get('/api/project').json()['project']['audioEvents'][0]['assetId'],expected)
+
+    def test_v4_primitive_transforms_round_trip_and_invalid_update_is_atomic(self):
+        object={'id':'a'*32,'kind':'primitive','geometry':'torus','name':'品牌圆环','x':1.2,'y':-.4,'z':.8,'rx':.2,'ry':1.5,'rz':-.3,'sx':2,'sy':.7,'sz':1.1,'opacity':.4,'visible':False}
+        self.assertEqual(self.client.put('/api/project',json={'project':{'version':4,'objects':[object]}}).status_code,200)
+        restored=self.client.get('/api/project').json()['project'];self.assertEqual(restored['version'],4)
+        for key,value in object.items():self.assertEqual(restored['objects'][0][key],value)
+        saved=self.module.PROJECT_FILE.read_bytes()
+        for patch in ({'sx':0},{'x':21},{'rx':1000},{'visible':'false'},{'geometry':None}):
+            self.assertEqual(self.client.put('/api/project',json={'project':{'objects':[{**object,**patch}]}}).status_code,422)
+            self.assertEqual(self.module.PROJECT_FILE.read_bytes(),saved)
+
+    def test_v3_migration_preserves_original_disk_bytes(self):
+        raw={'project':{'version':3,'objects':[{'id':'d'*32,'kind':'text','text':'旧版标题','x':-1,'y':.2,'z':0,'width':2,'height':.5}]}}
+        self.module.PROJECT_FILE.write_text(json.dumps(raw));original=self.module.PROJECT_FILE.read_bytes()
+        response=self.client.get('/api/project');self.assertEqual(response.status_code,200)
+        project=response.json()['project'];self.assertEqual(project['version'],4);self.assertEqual(project['objects'][0]['sx'],1);self.assertEqual(project['objects'][0]['rx'],0)
+        self.assertEqual(self.module.PROJECT_FILE.read_bytes(),original)
+
+    def test_stale_v3_client_cannot_overwrite_a_v4_project(self):
+        self.assertEqual(self.client.put('/api/project',json={'project':{'version':4,'name':'新版作品'}}).status_code,200)
+        original=self.module.PROJECT_FILE.read_bytes()
+        self.assertEqual(self.client.put('/api/project',json={'project':{'version':3,'name':'旧页面的空工程'}}).status_code,409)
+        self.assertEqual(self.module.PROJECT_FILE.read_bytes(),original)

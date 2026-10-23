@@ -17,7 +17,7 @@ name='nexus-audit-'+uuid.uuid4().hex[:10]
 with tempfile.TemporaryDirectory(prefix='nexus-docker-') as tmp:
     folder=Path(tmp)
     override=folder/'override.json'
-    override.write_text(json.dumps({'services':{'api':{'image':'nexus-fx-review-api:0.3.1','pull_policy':'never'}}}))
+    override.write_text(json.dumps({'services':{'api':{'image':'nexus-fx-review-api:0.4.0','pull_policy':'never'},'web':{'image':'nexus-fx-review-web:0.4.0','pull_policy':'never'}}}))
     with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
     env={**os.environ,'NEXUS_REVIEW_PORT':str(port)}
     command=['docker','compose','-p',name,'-f',str(ROOT/'compose.review.yml'),'-f',str(override)]
@@ -28,7 +28,7 @@ with tempfile.TemporaryDirectory(prefix='nexus-docker-') as tmp:
         for _ in range(100):
             try:
                 with urllib.request.urlopen(base+'/api/health',timeout=1) as response:
-                    assert json.load(response)['version']=='0.3.1'
+                    assert json.load(response)['version']=='0.4.0'
                 break
             except OSError:time.sleep(.2)
         else:raise AssertionError('API not ready through Nginx')

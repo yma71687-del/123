@@ -12,7 +12,7 @@ npm run build
 docker compose -p nexus-review -f compose.review.yml up -d --build
 ```
 
-评审只映射本机 43123（`NEXUS_REVIEW_PORT` 可覆盖），独立 `review_data` 卷，不启动 gate/tunnel，不映射 80/443。开发目录里的 frontend 静态源文件必须可被 Nginx worker 读取；这仅涉及公开前端代码，不应扩大认证文件的权限。内网容器 Up 不是验收，须运行浏览器／API 测试并实际保存、刷新、重开和下载。
+评审只映射本机 43123（`NEXUS_REVIEW_PORT` 可覆盖），独立 `review_data` 卷，不启动 gate/tunnel，不映射 80/443。`Dockerfile.web` 在 Node 构建阶段生成 dist，再复制进 Nginx 镜像；不再直接挂载前端源码，配套 nginx.conf 已进入镜像。内网容器 Up 不是验收，须运行浏览器／API 测试并实际保存、刷新、重开和下载。
 
 受管理的代理构建环境可能需要 Docker BuildKit 的 `build_ca` 公共证书 bundle；只添加已信任 CA，不关闭 TLS、pip 完整性或镜像摘要校验。普通公网构建不需要该 secret。`tests/docker_review.py` 是本地验证脚本，仅删除它自己创建的唯一项目和临时卷。
 
@@ -26,9 +26,9 @@ docker compose -p nexus-review -f compose.review.yml up -d --build
 
 ## 切换与回滚
 
-发布只替换 NEXUS 的完整静态文件集（HTML、app.js、project.js、CSS、vendor）与 API 镜像，保持其原工程卷与认证绑定。不可用旧 `update-ui.sh` 单文件覆盖；该脚本已失败关闭，不下载／不覆盖／不重启。
+发布只替换经固定提交构建的 NEXUS web 与 API 镜像，保持其原工程卷、网络及认证绑定。旧 live 若有 web 静态目录挂载，须先核对并只移除该旧挂载，避免它遮住镜像中的新 dist。不可用旧 `update-ui.sh` 单文件覆盖；该脚本已失败关闭，不下载／不覆盖／不重启。
 
-只操作经确认的 NEXUS Compose 服务；不停止宿主机 Nginx，不执行全局清理，不执行生产 `down -v`。回滚点必须同时包含前端文件集和 API 镜像。新代码在 GET 时只迁移内存对象、不改写旧 JSON；异常工程不会被自动覆盖，但仍要备份数据并核对版本。
+只操作经确认的 NEXUS Compose 服务；不停止宿主机 Nginx，不执行全局清理，不执行生产 `down -v`。回滚点必须同时包含 web 和 API 镜像。新代码在 GET 时只迁移内存对象、不改写旧 JSON；异常工程不会被自动覆盖，但仍要备份数据并核对版本。0.4.0 明确保存后写 v4，0.3.1 无法读取它，新 API 也拒绝旧 v3 客户端覆盖 v4 工程；降级前须保留新 v4 工程及其素材，以配套备份恢复旧版本，不得丢弃新编辑内容后直接覆盖。
 
 发布后实际验证：密码访问、四预设、图片／标题、音效时间、保存刷新、JSON 重开、错误提示和无声预览下载。再确认其他业务健康无变化。失败则回切先前代码／镜像；恢复数据只在确认需要时通过备份流程执行，不能盲目把旧快照覆盖到新数据上。
 

@@ -1,8 +1,12 @@
 .git
 .env
-uploads
-data
-__pycache__
-*.pyc
+.env.*
+.venv
 node_modules
 dist
+.local-data
+.test-results
+data
+uploads
+__pycache__
+*.pyc

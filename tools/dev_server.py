@@ -23,5 +23,7 @@ if args.csp:
             response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'self'"
             return response
     app.add_middleware(SecurityHeaders)
-app.mount('/',StaticFiles(directory=ROOT/'frontend',html=True),name='frontend')
+if not (ROOT/'dist/index.html').exists():
+    raise SystemExit('Run npm ci and npm run build before starting the application')
+app.mount('/',StaticFiles(directory=ROOT/'dist',html=True),name='frontend')
 uvicorn.run(app,host='127.0.0.1',port=args.port,log_level='warning')

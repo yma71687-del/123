@@ -7,12 +7,12 @@ import threading
 import uuid
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import ValidationError
 from models import Project, ProjectPayload
 
-app = FastAPI(title='NEXUS FX STUDIO API', version='0.3.1')
+app = FastAPI(title='NEXUS FX STUDIO API', version='0.4.0')
 DATA_DIR = Path(os.getenv('DATA_DIR', '/data')).resolve()
 ASSET_DIR = DATA_DIR / 'assets'
 META_DIR = ASSET_DIR / '.metadata'
@@ -59,7 +59,7 @@ def asset_metadata(path):
 
 @app.get('/api/health')
 def health():
-    return {'ok':True, 'service':'nexus-fx-studio', 'version':'0.3.1'}
+    return {'ok':True, 'service':'nexus-fx-studio', 'version':'0.4.0'}
 
 
 @app.get('/api/project')
@@ -74,14 +74,23 @@ def get_project():
     return {'project':Project().model_dump()}
 
 
+async def incoming_project_version(request: Request):
+    raw = await request.json()
+    project = raw.get('project') if isinstance(raw, dict) else None
+    return project.get('version', 4) if isinstance(project, dict) else None
+
+
 @app.put('/api/project')
-def save_project(body: ProjectPayload):
+def save_project(body: ProjectPayload, source_version=Depends(incoming_project_version)):
     with PROJECT_LOCK:
         if PROJECT_FILE.exists():
             try:
-                ProjectPayload.model_validate_json(PROJECT_FILE.read_text(encoding='utf-8'))
+                previous = json.loads(PROJECT_FILE.read_text(encoding='utf-8'))
+                ProjectPayload.model_validate(previous)
             except (ValueError, OSError, ValidationError) as exc:
                 raise HTTPException(409, 'Existing project is unreadable; back it up and recover it before saving over it') from exc
+            if previous.get('project', {}).get('version') == 4 and source_version == 3:
+                raise HTTPException(409, 'Saved project uses v4; reload the current editor before saving from a v3 client')
         try:
             atomic_json(PROJECT_FILE, body.model_dump())
         except OSError as exc:
