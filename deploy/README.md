@@ -19,14 +19,18 @@ set -euo pipefail
 installer="$(mktemp /tmp/nexus-deploy.XXXXXX.py)"
 trap 'rm -f "$installer"' EXIT
 curl --fail --location --retry 3 \
-  'https://raw.githubusercontent.com/yma71687-del/123/ebcadc3b0f6368ab183f51744ce75b5a9c39857a/deploy/tencent_console.py' \
+  'https://raw.githubusercontent.com/yma71687-del/123/d83d9afdd2804c89e9e9665c9886fe90415b8532/deploy/tencent_console.py' \
   --output "$installer"
-printf '%s  %s\n' '9d6296e6ebb78c58f8867a2b7332cba8f67095b815aaafc35cb6f83ffae1db62' "$installer" | sha256sum --check -
-python3 "$installer"
+printf '%s  %s\n' '178341ff7198d13ba2f2d1b24034fcd6fc221d61dde11bb88505239f8af02bed' "$installer" | sha256sum --check -
+python3 "$installer" --auto-password
 NEXUS_DEPLOY
 ```
 
-按提示在终端设置一个至少 12 位的**网页访问密码**，输入不回显。用户名固定为 `nexus`。不要发送密码、私钥、`auth.env` 或完整环境变量。密码仅通过标准输入生成 bcrypt 哈希，部署目录只保存哈希，不保存明文密码。
+**无需输入或确认密码。** 脚本自动生成网页密码，重试会沿用同一个值。用户名固定为 `nexus`，验收通过后会在交互终端显示自动密码，登录时复制即可。不要发送密码、私钥、`auth.env`、`login.json` 或包含密码的截图。
+
+自动模式将登录信息保存到部署目录的私有 `login.json`（权限 600，目录 700），同时使用标准输入生成 bcrypt 哈希；Compose 和 `auth.env` 只含哈希。无交互终端时不向日志打印密码，需在服务器终端自行查看该私有文件。此前手动设置的本工具实例密码会被自动密码替换；原站点与其他业务的密码保持原样。
+
+需要手动设置时可移除 `--auto-password`，或使用原有 `--password-file` 模式；这些模式不与自动模式同时使用。
 
 成功必须打印 **“公网登录及页面验收通过：https://…trycloudflare.com”**：检查包括未登录拒绝访问、正确认证、API 服务与版本、HTML 脚本策略和真实 JS 文件。只有本机通过或隧道日志出现网址都不算公网部署成功。请在自己的浏览器再验证素材上传、对象编辑、保存和刷新；本地自动化的浏览器验证不能代替目标服务器验收。
 
@@ -38,9 +42,9 @@ NEXUS_DEPLOY
 
 ## 重试、停止和数据
 
-网络中断可重新执行相同命令，输入第一次设置的网页密码。固定源码、配置或认证文件存在非预期变化时拒绝覆盖；并发发布会被锁阻止。不要手动删除部署目录来绕过检查。
+网络中断可重新执行相同命令，自动读取第一次生成的登录凭据，不会再次询问密码。固定源码、配置或私有文件权限存在非预期变化时拒绝覆盖；并发发布会被锁阻止。不要手动删除部署目录来绕过检查。
 
-若只想验证本机，可将命令中的最后一行改为 `python3 "$installer" --local-only`。这不会创建公网地址。
+若只想验证本机，可将命令中的最后一行改为 `python3 "$installer" --auto-password --local-only`。这不会创建公网地址。
 
 停止本工具创建的实例：将最后一行改为 `python3 "$installer" --stop`，其余下载与校验步骤保留。仅停止这四个服务，保留新工程卷，不做 `down -v` 或全局 Docker 清理；原业务保持原有配置。
 
