@@ -43,3 +43,13 @@
 - 第二个参考片超过聊天传输上限，未读取并核对完整技能；不能将其全部效果标记为已实现。
 
 本版实现范围以此清单和[验收记录](TEST_REPORT_DELIVERY.md)为准。源码包提供可运行应用和测试代码，不代表上述未接入能力已经完成。
+
+## 固定发布与审核
+
+- 应用源码提交：`de5252688a8cbd1763a019f9dac86e0cee8547d2`。
+- [可直接下载的完整交付包](https://raw.githubusercontent.com/yma71687-del/123/e894c7018be1b16993019f27aa107920f261454f/deliverables/NEXUS-AD-STUDIO-0.5.3-source.zip)，6797515 字节，407 个包内文件校验通过。
+- ZIP SHA256：`27dc2b3ed803b6b340275797b51ec855831baa3eb80d7548febad0c8f3471771`。
+- [真实带声字幕样片](https://raw.githubusercontent.com/yma71687-del/123/0ac9281253e083e0e6734c893cc2a04282c4bb51/deliverables/NEXUS-CAPTIONS-SHOWCASE-1080p.mp4)。
+- 版本启动器标签：`delivery-v0.5.3`；审核分支为 `codex/representative-sample`，未合并主分支，未修改腾讯云生产环境。
+
+ZIP 根目录的“部署到腾讯云.sh”是部署入口，使用版本标签中完成发布钉定的安装器；“完整源码”保留应用提交时的代码快照。
