@@ -2,15 +2,15 @@
 
 [当前完整交付范围](../docs/DELIVERY_STATUS.md) · [实测记录](../docs/TEST_REPORT_DELIVERY.md)
 
-**目标腾讯云尚未部署验收，没有已确认的线上网址。** SSH 22 端口拒绝连接，当前没有服务器登录授权；下列命令需在你已打开的腾讯云网页终端执行。无需手动设置密码，不需要发送任何密码或密钥。
+**用户控制台截图已显示四项应用服务运行、720p 带声字幕验收片通过；公网发布仍未完成，没有已确认的线上网址。** SSH 22 端口拒绝连接，当前没有服务器登录授权；下列命令需在你已打开的腾讯云网页终端执行。无需手动设置密码，不需要发送任何密码或密钥。
 
 ## 整行复制执行
 
 ```bash
-bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.1/deploy/bootstrap.sh" | bash'
+bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.2/deploy/bootstrap.sh" | bash'
 ```
 
-安装器网络修复版为 **0.5.3.1**，应用仍为 0.5.3，沿用相同目录、密码与数据。旧启动器不包含本次修复；下载超时后请使用上面的新命令。
+当前安装器为 **0.5.3.2**，应用仍为 0.5.3，沿用相同目录、密码与数据。旧启动器不包含本次修复；下载超时后请使用上面的新命令。
 
 下载启动器后会核验安装器 SHA256，再核验固定源码包；依次构建服务并实际制作 4 秒验收视频。只有画面动画、定时字幕、非静音 AAC、MP4 解码和公网文件下载均通过，才打印成功网址。安装日志中的普通地址不代表部署成功。
 
@@ -33,13 +33,13 @@ bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "h
 仅本机验收（不建立公网隧道）：
 
 ```bash
-bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.1/deploy/bootstrap.sh" | bash -s -- --local-only'
+bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.2/deploy/bootstrap.sh" | bash -s -- --local-only'
 ```
 
 停止本版服务并保留数据：
 
 ```bash
-bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.1/deploy/bootstrap.sh" | bash -s -- --stop'
+bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.2/deploy/bootstrap.sh" | bash -s -- --stop'
 ```
 
 也可解压[统一源码交付包](../deliverables/NEXUS-AD-STUDIO-0.5.3-source.zip?raw=true)并执行根目录 `bash 部署到腾讯云.sh`，使用相同固定发布。若需保留旧站点域名，必须先审核原路由与备份，不能直接覆盖。
@@ -51,3 +51,17 @@ bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "h
 若服务器仍无法下载 GitHub：在电脑下载上方交付 ZIP，通过腾讯云终端的文件上传功能放到服务器，例如 `/home/ubuntu/NEXUS-AD-STUDIO-0.5.3-source.zip`。使用相同新版启动器并加 `--release-file /home/ubuntu/NEXUS-AD-STUDIO-0.5.3-source.zip` 即可，上传文件仍需匹配固定 SHA256。这只免去源码 ZIP 下载，镜像和 npm 等构建依赖仍需联网。
 
 实际网络与服务器上线结果仍需以终端输出为准；本机验证通过不能替代腾讯云验收。
+
+## 应用已运行，但提示“原有运行容器状态发生变化”
+
+0.5.3.1 用全部运行容器的 ID 进行前后比较，会把本部署服务在重试中被重建也算作变化。0.5.3.2 已通过实际 Docker 重建测试复现并修复：仅排除所有权已核对的同一 Compose 项目中的 api／web／render／gate／tunnel，其他项目、仅名称相似的容器和同项目未知服务仍受保护。发现其他业务容器停止或替换时仍阻止发布，并打印具体名称和 ID。
+
+若截图已显示应用运行及制作验收通过，可继续已有部署，不重建或重启四项应用服务，不重写认证文件：
+
+```bash
+bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.2/deploy/bootstrap.sh" | bash -s -- --resume'
+```
+
+恢复流程仍核对所有权、配置、凭据、固定源码、磁盘余量、真实成片及其他业务运行基线；仅启动／更新本项目的公网隧道并验收。若现有应用未运行则停止并报错，不自动重启它们；尚无本版实例时不能使用 `--resume`。
+
+`protected-containers.json` 私有文件保存本次运行的其他容器基线。旧安装器未保存上次失败时的详细基线，因此截图不足以确认当时是否另有外部容器停止；新版检查不能回溯证明上次所有业务健康。

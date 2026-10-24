@@ -55,6 +55,29 @@ def docker_command():
 def running_containers(docker):
     return set(run(docker+['ps','--format','{{.ID}}']).split())
 
+def protected_containers(docker, project):
+    # IDs belonging to our verified Compose project may change on a retry.
+    # Other projects, similarly named containers and unknown services remain
+    # protected. Call only after guard_namespace has verified ownership.
+    layout='{{.ID}}\t{{.Names}}\t{{.Label "com.docker.compose.project"}}\t{{.Label "com.docker.compose.service"}}'
+    output=run(docker+['ps','--no-trunc','--format',layout])
+    protected={}
+    for line in output.splitlines():
+        fields=line.split('\t')
+        if len(fields)!=4 or not re.fullmatch('[a-f0-9]{64}',fields[0]):
+            raise RuntimeError('无法读取容器保护清单，未继续部署')
+        identifier,name,owner,service=fields
+        if owner==project and service in ('api','web','render','gate','tunnel'):continue
+        protected[identifier]=name
+    return protected
+
+def verify_protected_containers(docker, project, before):
+    current=protected_containers(docker,project)
+    missing=sorted(set(before)-set(current))
+    if missing:
+        names=', '.join(before[key]+' ('+key[:12]+')' for key in missing)
+        raise RuntimeError('原有其他业务容器已停止或被替换：'+names+'。未宣称部署成功；未自动重启或修改这些业务')
+
 def occupied_resources(docker, project):
     containers = run(docker+['ps','-a','--filter','label=com.docker.compose.project='+project,'--format','{{.ID}}']).split()
     volumes = set(run(docker+['volume','ls','--format','{{.Name}}']).split())
@@ -366,7 +389,9 @@ def main():
     credentials.add_argument('--auto-password',action='store_true',help='自动生成并复用网页密码，无需输入；仅显示在终端并保存到私有 login.json')
     parser.add_argument('--local-only',action='store_true',help='仅验证本机受保护入口，不创建公网隧道')
     parser.add_argument('--release-file',type=Path,help='使用已上传的官方交付 ZIP，仍需匹配固定 SHA256；避免重新下载源码包')
-    parser.add_argument('--stop',action='store_true',help='只停止本工具创建的 NEXUS 服务，保留数据卷')
+    operation=parser.add_mutually_exclusive_group()
+    operation.add_argument('--stop',action='store_true',help='只停止本工具创建的 NEXUS 服务，保留数据卷')
+    operation.add_argument('--resume',action='store_true',help='复用已运行的本版服务，不重建或重启四项应用服务；重新验收并继续发布公网入口')
     args=parser.parse_args()
     if not re.fullmatch(r'nexus-[a-z0-9-]{4,48}',args.project) or not 1024<=args.port<=65535:raise RuntimeError('项目名或端口无效')
     docker=docker_command();state=args.state_dir.absolute()
@@ -380,12 +405,17 @@ def main():
     if args.stop:
         if not owned:raise RuntimeError('没有可停止的本工具部署')
         run(compose+['stop'],visible=True);print('只停止了本工具的 NEXUS 服务；保留工程卷和其他业务。');return
-    resources_available(state,docker)
+    if args.resume:
+        if not owned:raise RuntimeError('尚无本版部署，不能使用 --resume；请先正常部署')
+        for filename in ('auth.env','compose.json'):
+            read_private(state/filename)
+        if args.auto_password:read_private(state/'login.json')
+    else:resources_available(state,docker)
     if not owned:check_port(args.port)
     if not owned:state.mkdir(parents=True,exist_ok=False,mode=0o700)
     if lock is None:lock=acquire_lock(state)
     marker={'owner':OWNER,'project':args.project,'source':SOURCE,'created_at':datetime.now(timezone.utc).isoformat()}
-    write_private(state/'managed.json',json.dumps(marker))
+    if not owned:write_private(state/'managed.json',json.dumps(marker))
     if args.auto_password:
         password=automatic_password(state)
     elif args.password_file:
@@ -396,23 +426,28 @@ def main():
         password=getpass.getpass('输入 NEXUS 网页访问密码（至少 12 位，不回显，不是 SSH 密码）：')
         if not (state/'auth.env').exists() and password!=getpass.getpass('再次输入访问密码：'):raise RuntimeError('两次密码不一致，未部署')
     if not 12<=len(password)<=64 or len(password.encode('utf-8'))>72 or '\n' in password or '\r' in password:raise RuntimeError('访问密码需为 12–64 位单行文本，UTF-8 不超过 72 字节')
-    SECRETS.append(password);before=running_containers(docker)
+    SECRETS.append(password);before=protected_containers(docker,args.project)
+    write_private(state/'protected-containers.json',json.dumps({'source':SOURCE,'project':args.project,'recorded_at':datetime.now(timezone.utc).isoformat(),'containers':before},ensure_ascii=False,indent=2)+'\n')
+    print('保护检查：记录 '+str(len(before))+' 个其他运行容器；仅排除本部署的五项服务。',flush=True)
     source=unpack_release(state,args.release_file)
-    run(docker+['pull',CADDY_IMAGE],visible=True)
-    if args.auto_password or not (state/'auth.env').exists():
-        hashed=password_hash(docker,password)
-        write_private(state/'auth.env',"NEXUS_USER=nexus\nNEXUS_PASSWORD_HASH='"+hashed+"'\n")
-    elif not owned:raise RuntimeError('认证文件已存在，未覆盖')
-    if (state/'compose.json').exists() and (state/'compose.json').read_text()!=config:raise RuntimeError('部署配置被改动，未覆盖')
-    write_private(state/'compose.json',config)
-    print('仅构建固定版本的新 NEXUS 容器；不停止宿主机 Nginx 或其他业务。',flush=True)
-    for service in ('api','web','render'):
-        run(compose+['build',service],visible=True)
-    run(compose+['up','-d','--no-build','api','web','render','gate'],visible=True)
+    if args.resume:
+        print('复用现有服务和密码，不重建或重启 API、Web、渲染器与登录网关；重新执行真实制作验收。',flush=True)
+    else:
+        run(docker+['pull',CADDY_IMAGE],visible=True)
+        if args.auto_password or not (state/'auth.env').exists():
+            hashed=password_hash(docker,password)
+            write_private(state/'auth.env',"NEXUS_USER=nexus\nNEXUS_PASSWORD_HASH='"+hashed+"'\n")
+        elif not owned:raise RuntimeError('认证文件已存在，未覆盖')
+        if (state/'compose.json').exists() and (state/'compose.json').read_text()!=config:raise RuntimeError('部署配置被改动，未覆盖')
+        write_private(state/'compose.json',config)
+        print('仅构建固定版本的新 NEXUS 容器；不停止宿主机 Nginx 或其他业务。',flush=True)
+        for service in ('api','web','render'):
+            run(compose+['build',service],visible=True)
+        run(compose+['up','-d','--no-build','api','web','render','gate'],visible=True)
     wait_gate('http://127.0.0.1:'+str(args.port),password)
     acceptance=verify_rendered_delivery('http://127.0.0.1:'+str(args.port),password,compose,state)
     verify_sample_download('http://127.0.0.1:'+str(args.port),password,acceptance['jobId'],acceptance['media']['sha256'])
-    if not before.issubset(running_containers(docker)):raise RuntimeError('原有运行容器状态发生变化，需要检查；未宣称部署成功')
+    verify_protected_containers(docker,args.project,before)
     if args.local_only:
         print('本机广告界面与渲染服务验收通过；公网未启用。')
         if args.auto_password:show_automatic_login(state,password)
@@ -432,7 +467,7 @@ def main():
             except (OSError,RuntimeError) as error:last=safe_message(error)
         time.sleep(3)
     else:raise RuntimeError('公网验收尚未通过：'+last+'。本机数据保留，不能据隧道日志中的地址宣称上线')
-    if not before.issubset(running_containers(docker)):raise RuntimeError('原有运行容器状态发生变化，需要检查')
+    verify_protected_containers(docker,args.project,before)
     write_private(state/'url.txt',url+'/#advertising\n')
     print('\n公网登录及广告服务验收通过：'+url+'/#advertising'+'\n网页登录用户名：nexus')
     if args.auto_password:show_automatic_login(state,password)
