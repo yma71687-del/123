@@ -42,6 +42,13 @@ class API(unittest.TestCase):
             self.assertEqual(saved['name'],asset['name']);self.assertEqual(saved['contentType'],'image/png')
             binary=reopened.get(asset['url']);self.assertEqual(binary.content,PNG)
             self.assertEqual(binary.headers['x-content-type-options'],'nosniff')
+    def test_render_manifest_readable_but_saved_project_private(self):
+        asset=self.upload().json()
+        manifest=self.module.META_DIR/(asset['id']+'.json')
+        self.assertEqual(manifest.stat().st_mode&0o777,0o644)
+        self.assertEqual(json.loads(manifest.read_text())['contentType'],'image/png')
+        self.assertEqual(self.client.put('/api/project',json={'project':{'name':'私有项目'}}).status_code,200)
+        self.assertEqual(self.module.PROJECT_FILE.stat().st_mode&0o777,0o600)
     def test_full_project_round_trip(self):
         asset=self.upload().json();text_id='c'*32
         project={'version':4,'name':'可恢复广告','template':'holo','aspect':'2.39:1','duration':12,'assets':[asset],'objects':[{'id':'b'*32,'kind':'image','assetId':asset['id'],'x':-1,'y':.5,'z':0,'width':1,'height':1},{'id':text_id,'kind':'text','text':'品牌标题','x':0,'y':-1,'z':.2,'width':2,'height':.5}],'keyframes':[{'t':1,'scale':1.5,'color':'#123456'}]}

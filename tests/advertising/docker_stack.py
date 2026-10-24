@@ -33,6 +33,12 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
     try:
         console.run(command+['up','-d','--no-build','render','api','web','gate'])
         base=f'http://127.0.0.1:{port}';console.wait_gate(base,password)
+        initial_project=console.local_json(base,'/api/advertising/project',password)
+        acceptance=console.verify_rendered_delivery(base,password,command,folder)
+        assert acceptance['status']=='done' and acceptance['media']['ok']
+        delivered=console.verify_sample_download(base,password,acceptance['jobId'],acceptance['media']['sha256'])
+        assert delivered['sha256']==acceptance['media']['sha256']
+        assert console.local_json(base,'/api/advertising/project',password)==initial_project
         with sync_playwright() as p:
             executable=None if os.environ.get('PLAYWRIGHT_USE_BUNDLED') else shutil.which('chromium')
             browser=p.chromium.launch(executable_path=executable,args=['--no-sandbox'])
@@ -47,13 +53,21 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             page.get_by_test_id('caption-apply-import').click()
             page.get_by_label('字幕样式').select_option('plain')
             page.get_by_label('字幕颜色',exact=True).evaluate("(el)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'#ff00ff');el.dispatchEvent(new Event('input',{bubbles:true}));}")
+            import sys
+            sys.path.insert(0,str(ROOT/'tests/e2e'))
+            from test_editor import png_bytes
+            page.get_by_test_id('ad-media').set_input_files({'name':'真实产品图.png','mimeType':'image/png','buffer':png_bytes()})
+            page.wait_for_function("()=>document.querySelector('.global-status')?.textContent.includes('素材已实际上传')")
             page.get_by_role('button',name='保存到云端',exact=True).click()
             page.wait_for_function("()=>document.querySelector('[role=status]')?.textContent.includes('保存到云端')")
-            page.get_by_test_id('ad-render').click()
+            with page.expect_response(lambda response: response.url==base+'/api/advertising/jobs' and response.request.method=='POST') as submitted:
+                page.get_by_test_id('ad-render').click()
+            assert submitted.value.status==202,submitted.value.text()
             page.wait_for_function('()=>document.querySelector("[data-testid=ad-job]") || document.querySelector(".global-status.err")')
             assert page.get_by_test_id('ad-job').count(),page.locator('.global-status').inner_text()
-            page.wait_for_selector('[data-testid=ad-job] a',timeout=180000)
-            with page.expect_download() as download:page.locator('[data-testid=ad-job] a').first.click()
+            rendered=page.get_by_test_id('ad-job').filter(has_text='NEXUS / 科技品牌广告').first
+            rendered.locator('a').wait_for(timeout=180000)
+            with page.expect_download() as download:rendered.locator('a').click()
             output=ROOT/'.test-results/advertising/docker-render.mp4';output.parent.mkdir(parents=True,exist_ok=True);download.value.save_as(output)
             probe=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(output)]))
             assert {s['codec_type'] for s in probe['streams']}>={'video','audio'}
@@ -62,6 +76,8 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             assert max(abs(v) for v in struct.unpack('<'+'h'*(len(pcm)//2),pcm))>300
             rgb=subprocess.check_output(['ffmpeg','-v','error','-threads','1','-i',str(output),'-ss','1.2','-vf','crop=1280:160:0:560','-frames:v','1','-threads','1','-pix_fmt','rgb24','-f','rawvideo','pipe:1'])
             assert sum(1 for r,g,b in zip(rgb[0::3],rgb[1::3],rgb[2::3]) if r>180 and g<100 and b>140)>400,'Subtitles must be burned into the container render'
+            product_rgb=subprocess.check_output(['ffmpeg','-v','error','-threads','1','-i',str(output),'-ss','1.2','-frames:v','1','-threads','1','-pix_fmt','rgb24','-f','rawvideo','pipe:1'])
+            assert sum(1 for r,g,b in zip(product_rgb[0::3],product_rgb[1::3],product_rgb[2::3]) if r>150 and 40<g<170 and b<80)>500,'Uploaded product pixels must appear in the actual encoded video'
             # Exercise the actual Nginx streaming upload and FFmpeg/Chinese OCR
             # binaries inside the API's unchanged 256 MB / 0.5 CPU limits.
             import base64
@@ -92,9 +108,17 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             page.wait_for_function('()=>{const image=document.querySelector("[data-testid=reference-report] img");return image?.complete && image.naturalWidth>0;}')
             page.screenshot(path=str(output.parent/'docker-workbench.png'),full_page=True)
             assert errors==[],errors
+            saved_project=console.local_json(base,'/api/advertising/project',password)
+            count=len(console.local_json(base,'/api/advertising/jobs',password)['jobs'])
+            repeated=console.verify_rendered_delivery(base,password,command,folder)
+            assert repeated['jobId']==acceptance['jobId']
+            assert len(console.local_json(base,'/api/advertising/jobs',password)['jobs'])==count
+            assert console.local_json(base,'/api/advertising/project',password)==saved_project
+            (ROOT/'.test-results/delivery').mkdir(parents=True,exist_ok=True)
+            (ROOT/'.test-results/delivery/docker-acceptance.json').write_text(json.dumps(repeated,ensure_ascii=False,indent=2))
             context.close();browser.close()
         assert before.issubset(console.running_containers(['docker']))
-        print('PASS: real Caddy login, Nginx CSP, v2 project, audible MP4 with burned captions, streamed reference upload, Chinese OCR and frame/audio extraction in limited API container')
+        print('PASS: automatic real-media acceptance, idempotent retry, preserved user project, authenticated workbench, MP4 captions/audio, and reference upload/OCR')
     except BaseException:
         diagnostic=subprocess.run(command+['logs','--no-color','--tail','100','api','render'],capture_output=True,text=True)
         print(console.safe_message(diagnostic.stdout),flush=True)

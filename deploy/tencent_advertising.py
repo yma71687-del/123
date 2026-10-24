@@ -36,8 +36,8 @@ def safe_message(value):
         if secret:text = text.replace(secret, '[redacted]')
     return text
 
-def run(command, *, input=None, visible=False):
-    result = subprocess.run(command, input=input, text=True, capture_output=not visible)
+def run(command, *, input=None, visible=False, timeout=None):
+    result = subprocess.run(command, input=input, text=True, capture_output=not visible, timeout=timeout)
     if result.returncode:
         raise RuntimeError(safe_message((result.stderr or '').strip()[-2500:]) or '命令执行失败：'+command[0])
     return result.stdout or ''
@@ -222,6 +222,84 @@ def wait_gate(base, password, seconds=60):
         except (OSError,RuntimeError) as error:last=error;time.sleep(2)
     raise RuntimeError('入口验收失败：'+safe_message(last))
 
+def local_json(base, path, password, method='GET', value=None):
+    if not re.fullmatch(r'http://127\.0\.0\.1:\d+', base):raise RuntimeError('制作验收只允许访问本机受保护入口')
+    credential=base64.b64encode(('nexus:'+password).encode()).decode()
+    request=urllib.request.Request(base+path,method=method,
+        data=None if value is None else json.dumps(value).encode(),
+        headers={'Authorization':'Basic '+credential,'Content-Type':'application/json'})
+    opener=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    try:
+        with opener.open(request,timeout=15) as response:return json.load(response)
+    except urllib.error.HTTPError as error:
+        try:detail=json.load(error).get('detail','')
+        except (ValueError,AttributeError):detail=''
+        raise RuntimeError('制作验收请求失败：'+safe_message(detail or 'HTTP '+str(error.code))) from error
+
+def acceptance_project():
+    # Always synthetic. Never copy a saved customer's pictures, music or text.
+    return {'version':2,'name':'NEXUS 安装验收 / '+SOURCE[:8],'template':'cloud',
+        'headline':'NEXUS 制作验收','tagline':'动画、字幕与声音自动验收','accent':'#64f4d5',
+        'duration':4,'speed':1,'radius':1,'labels':['创意','品牌','声音','动效'],
+        'imageAssetIds':[],'values':[10,20,30,40],
+        'music':{'enabled':True,'gain':.35,'assetId':None},
+        'sfx':[{'type':'whoosh','time':.2,'gain':.6},{'type':'impact','time':1.7,'gain':.5}],
+        'captions':{'enabled':True,'style':'plain','position':'bottom','fontSize':72,'color':'#ff00ff',
+            'cues':[{'text':'NEXUS / 字幕与声音验收','startMs':500,'endMs':3500,'timestampMs':None,'confidence':None}]}}
+
+def verify_rendered_delivery(base, password, compose, state):
+    ledger=state/'acceptance.json'
+    saved=None
+    if ledger.exists() or ledger.is_symlink():
+        saved=json.loads(read_private(ledger))
+        if not isinstance(saved,dict) or saved.get('source')!=SOURCE or not isinstance(saved.get('jobId'),str) or not re.fullmatch('[a-f0-9]{32}',saved['jobId']):
+            raise RuntimeError('制作验收记录不属于此固定版本，未覆盖')
+    job=None
+    if saved:
+        jobs=local_json(base,'/api/advertising/jobs',password)['jobs']
+        job=next((item for item in jobs if item['id']==saved['jobId']),None)
+        if job and job['status'] in ('failed','cancelled'):job=None
+    if job is None:
+        job=local_json(base,'/api/advertising/jobs',password,'POST',{'project':acceptance_project(),'format':'mp4','resolution':'720p'})
+        if not re.fullmatch('[a-f0-9]{32}',job.get('id','')):raise RuntimeError('制作验收未取得真实渲染编号')
+        write_private(ledger,json.dumps({'source':SOURCE,'jobId':job['id'],'status':'running'})+'\n')
+    print('验收样片：'+job['id'][:8]+'，读取实际任务状态…',flush=True)
+    deadline=time.monotonic()+210
+    previous=-1
+    while job['status'] in ('queued','running') and time.monotonic()<deadline:
+        progress=int(job.get('progress',0)*100)//10*10
+        if progress!=previous:
+            print('验收渲染 '+str(progress)+'%',flush=True);previous=progress
+        time.sleep(2)
+        job=local_json(base,'/api/advertising/jobs/'+job['id'],password)
+    if job['status']!='done':raise RuntimeError('制作验收未完成：'+safe_message(job.get('error') or job['status']))
+    print('检查真实视频编码、画面变化、字幕时点和声音…',flush=True)
+    result=json.loads(run(compose+['exec','-T','api','python','/app/verify_delivery.py','--url',
+        'http://render:8010/api/advertising/jobs/'+job['id']+'/file'],timeout=90))
+    if not result.get('ok'):raise RuntimeError('制作验收没有返回有效结果')
+    summary={'source':SOURCE,'jobId':job['id'],'status':'done','verifiedAt':datetime.now(timezone.utc).isoformat(),'media':result}
+    write_private(ledger,json.dumps(summary,ensure_ascii=False,indent=2)+'\n')
+    print('制作验收通过：720p MP4、实际动画、定时字幕和非静音 AAC；界面任务列表可下载验收片。',flush=True)
+    return summary
+
+def verify_sample_download(base, password, job_id, expected):
+    if not (re.fullmatch(r'http://127\.0\.0\.1:\d+',base) or re.fullmatch(r'https://[a-z0-9-]+\.trycloudflare\.com',base)):
+        raise RuntimeError('验收下载地址不属于当前入口')
+    if not re.fullmatch('[a-f0-9]{32}',job_id) or not re.fullmatch('[a-f0-9]{64}',expected):
+        raise RuntimeError('验收文件编号或校验和无效')
+    credential=base64.b64encode(('nexus:'+password).encode()).decode()
+    request=urllib.request.Request(base+'/api/advertising/jobs/'+job_id+'/file',headers={'Authorization':'Basic '+credential})
+    opener=urllib.request.build_opener(urllib.request.ProxyHandler({})) if base.startswith('http://127.0.0.1:') else urllib.request.build_opener()
+    checksum=hashlib.sha256();size=0
+    with opener.open(request,timeout=20) as response:
+        if 'video/mp4' not in response.headers.get('Content-Type',''):raise RuntimeError('入口没有返回实际 MP4 视频')
+        while chunk:=response.read(65536):
+            size+=len(chunk)
+            if size>16*1024**2:raise RuntimeError('入口验收下载超过限制')
+            checksum.update(chunk)
+    if checksum.hexdigest()!=expected:raise RuntimeError('入口下载的视频与实际验收样片不一致')
+    return {'bytes':size,'sha256':checksum.hexdigest()}
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--state-dir',type=Path,default=Path.home()/'.local/share/nexus-advertising-v052')
@@ -275,6 +353,8 @@ def main():
         run(compose+['build',service],visible=True)
     run(compose+['up','-d','--no-build','api','web','render','gate'],visible=True)
     wait_gate('http://127.0.0.1:'+str(args.port),password)
+    acceptance=verify_rendered_delivery('http://127.0.0.1:'+str(args.port),password,compose,state)
+    verify_sample_download('http://127.0.0.1:'+str(args.port),password,acceptance['jobId'],acceptance['media']['sha256'])
     if not before.issubset(running_containers(docker)):raise RuntimeError('原有运行容器状态发生变化，需要检查；未宣称部署成功')
     if args.local_only:
         print('本机广告界面与渲染服务验收通过；公网未启用。')
@@ -288,7 +368,10 @@ def main():
         matches=re.findall(r'https://[a-z0-9-]+\.trycloudflare\.com',logs)
         if matches:
             url=matches[-1]
-            try:verify_gate(url,password);break
+            try:
+                verify_gate(url,password)
+                verify_sample_download(url,password,acceptance['jobId'],acceptance['media']['sha256'])
+                break
             except (OSError,RuntimeError) as error:last=safe_message(error)
         time.sleep(3)
     else:raise RuntimeError('公网验收尚未通过：'+last+'。本机数据保留，不能据隧道日志中的地址宣称上线')

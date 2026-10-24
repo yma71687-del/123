@@ -31,10 +31,11 @@ AD_SERVICE = os.getenv('NEXUS_AD_SERVICE', '').rstrip('/')
 app.include_router(create_router(DATA_DIR))
 
 
-def atomic_json(path: Path, value):
+def atomic_json(path: Path, value, *, mode=0o600):
     fd, temporary = tempfile.mkstemp(prefix='nexus-', suffix='.tmp', dir=path.parent)
     try:
         with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+            os.fchmod(stream.fileno(), mode)
             json.dump(value, stream, ensure_ascii=False, indent=2)
             stream.flush()
             os.fsync(stream.fileno())
@@ -170,7 +171,9 @@ async def upload_asset(file: UploadFile = File(...)):
             raise HTTPException(400, 'Empty upload')
         metadata = {'id':asset_id, 'name':raw_name, 'size':size, 'contentType':content_type, 'url':'/api/assets/'+asset_id}
         temporary.replace(target)
-        atomic_json(metadata_path,metadata)
+        # The read-only render container runs as uid 1000, while the API owns
+        # this volume as root. Only asset manifests need cross-user reads.
+        atomic_json(metadata_path,metadata,mode=0o644)
         return metadata
     except Exception:
         target.unlink(missing_ok=True)

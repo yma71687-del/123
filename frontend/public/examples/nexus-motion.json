@@ -1,0 +1,34 @@
+{
+  "project": {
+    "version": 2,
+    "name": "NEXUS / 带声字幕示范工程",
+    "template": "showcase",
+    "headline": "让创意，成为信号",
+    "tagline": "NEXUS FX STUDIO · MOTION SYSTEM",
+    "accent": "#64f4d5",
+    "duration": 15,
+    "speed": 1,
+    "radius": 1,
+    "labels": ["创意", "影像", "品牌", "设计", "声音", "光影", "动效", "未来"],
+    "imageAssetIds": [],
+    "values": [36, 58, 74, 96],
+    "music": { "enabled": true, "gain": 0.42, "assetId": null },
+    "sfx": [
+      { "type": "whoosh", "time": 0.2, "gain": 0.6 },
+      { "type": "impact", "time": 5, "gain": 0.55 },
+      { "type": "whoosh", "time": 10, "gain": 0.55 }
+    ],
+    "captions": {
+      "enabled": true,
+      "style": "tech",
+      "position": "bottom",
+      "fontSize": 56,
+      "color": "#ffffff",
+      "cues": [
+        { "text": "科技动效，让产品成为主角", "startMs": 550, "endMs": 4650, "timestampMs": null, "confidence": null },
+        { "text": "字幕、音乐与音效，真实合成为成片", "startMs": 5150, "endMs": 9550, "timestampMs": null, "confidence": null },
+        { "text": "NEXUS FX STUDIO / 把创意带到眼前", "startMs": 10200, "endMs": 14650, "timestampMs": null, "confidence": null }
+      ]
+    }
+  }
+}

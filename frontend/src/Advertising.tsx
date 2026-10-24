@@ -31,6 +31,12 @@ const templates = [
   ["grid", "科技背景／片尾", "蜂窝、透视网格、流光与动态标题"],
 ] as const;
 const draftKey = "nexus-ad-draft-v1";
+const exampleBackupKey = "nexus-ad-before-example-v2";
+type ExampleBackup = {
+  project: AdProject;
+  format: "mp4" | "webm-alpha" | "prores";
+  resolution: "720p" | "1080p";
+};
 export function Advertising() {
   const [project, setProject] = useState<AdProject>(structuredClone(defaultAd));
   const [status, setStatus] = useState("正在读取广告工程…");
@@ -45,6 +51,14 @@ export function Advertising() {
   const [captionImport, setCaptionImport] = useState<CaptionImport | null>(
     null,
   );
+  const [canRestoreExample, setCanRestoreExample] = useState(() => {
+    try {
+      return !!localStorage.getItem(exampleBackupKey);
+    } catch {
+      return false;
+    }
+  });
+  const exampleBackup = useRef<ExampleBackup | null>(null);
   const valid = adSchema.safeParse(project).success;
   const player = useRef<PlayerRef>(null);
   const file = useRef<HTMLInputElement>(null);
@@ -71,6 +85,61 @@ export function Advertising() {
   };
   const refresh = async () =>
     setJobs((await api<{ jobs: Job[] }>("/api/advertising/jobs")).jobs);
+  const loadExample = () =>
+    run(async () => {
+      const data = await api<{ project: unknown }>(
+        "/examples/nexus-motion.json",
+      );
+      const example = adSchema.parse(data.project);
+      if (JSON.stringify(example) === JSON.stringify(project)) {
+        note("当前已经是示范工程，可直接播放或渲染。");
+        return;
+      }
+      const backup = { project: adSchema.parse(project), format, resolution };
+      exampleBackup.current = structuredClone(backup);
+      let durable = true;
+      try {
+        localStorage.setItem(exampleBackupKey, JSON.stringify(backup));
+      } catch {
+        durable = false;
+      }
+      setCanRestoreExample(true);
+      patch(example);
+      setFormat("mp4");
+      setResolution("1080p");
+      note(
+        (ready
+          ? "已载入 15 秒带声字幕示范工程，可播放、修改和渲染；点击保存才会同步云端。"
+          : "示范工程可先预览；云端渲染服务尚未连接。") +
+          (durable
+            ? " 载入前参数已备份。"
+            : " 载入前参数仅暂存在当前页面，请保持页面打开。"),
+        !ready || !durable,
+      );
+    });
+  const restoreExample = () =>
+    run(async () => {
+      const raw =
+        exampleBackup.current ??
+        JSON.parse(localStorage.getItem(exampleBackupKey) ?? "null");
+      if (!raw) throw Error("没有载入前的工程备份");
+      const previous = adSchema.parse(raw.project);
+      patch(previous);
+      setFormat(
+        ["mp4", "webm-alpha", "prores"].includes(raw.format)
+          ? raw.format
+          : "mp4",
+      );
+      setResolution(raw.resolution === "720p" ? "720p" : "1080p");
+      exampleBackup.current = null;
+      try {
+        localStorage.removeItem(exampleBackupKey);
+      } catch {
+        /* The private memory copy was restored. */
+      }
+      setCanRestoreExample(false);
+      note("已恢复最近一次载入前的工程参数，尚未同步云端。");
+    });
   useEffect(() => {
     let disposed = false;
     Promise.all([
@@ -223,6 +292,22 @@ export function Advertising() {
           <a className="ad-back" href="#">
             返回 3D 工程
           </a>
+          <button
+            data-testid="ad-load-example"
+            disabled={busy || !valid}
+            onClick={loadExample}
+          >
+            载入带声字幕示范
+          </button>
+          {canRestoreExample && (
+            <button
+              data-testid="ad-restore-example"
+              disabled={busy}
+              onClick={restoreExample}
+            >
+              恢复载入前参数
+            </button>
+          )}
           <button onClick={() => file.current?.click()}>导入工程</button>
           <button
             onClick={() =>

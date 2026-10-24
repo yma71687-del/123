@@ -53,3 +53,13 @@ class AdvertisingInstaller(unittest.TestCase):
             self.assertFalse(any('ports' in config['services'][key] for key in ('render','api','web','tunnel')))
             self.assertEqual(config['services']['render']['volumes'][0],'nexus_data:/source-data:ro')
             self.assertNotIn(password,json.dumps(config))
+
+    def test_acceptance_record_and_local_target_guards(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state=Path(tmp)
+            console.write_private(state/'acceptance.json',json.dumps({'source':'foreign','jobId':'a'*32}))
+            with self.assertRaisesRegex(RuntimeError,'不属于此固定版本'):
+                console.verify_rendered_delivery('http://127.0.0.1:43150','not-a-real-password',[],state)
+            self.assertEqual(json.loads((state/'acceptance.json').read_text())['source'],'foreign')
+        with self.assertRaisesRegex(RuntimeError,'本机'):
+            console.local_json('http://example.invalid','/api/advertising/jobs','not-a-real-password')
