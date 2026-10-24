@@ -7,8 +7,10 @@
 ## 整行复制执行
 
 ```bash
-bash -o pipefail -c 'curl -fLsS --retry 3 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3/deploy/bootstrap.sh" | bash'
+bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.1/deploy/bootstrap.sh" | bash'
 ```
+
+安装器网络修复版为 **0.5.3.1**，应用仍为 0.5.3，沿用相同目录、密码与数据。旧启动器不包含本次修复；下载超时后请使用上面的新命令。
 
 下载启动器后会核验安装器 SHA256，再核验固定源码包；依次构建服务并实际制作 4 秒验收视频。只有画面动画、定时字幕、非静音 AAC、MP4 解码和公网文件下载均通过，才打印成功网址。安装日志中的普通地址不代表部署成功。
 
@@ -31,13 +33,21 @@ bash -o pipefail -c 'curl -fLsS --retry 3 "https://raw.githubusercontent.com/yma
 仅本机验收（不建立公网隧道）：
 
 ```bash
-bash -o pipefail -c 'curl -fLsS --retry 3 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3/deploy/bootstrap.sh" | bash -s -- --local-only'
+bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.1/deploy/bootstrap.sh" | bash -s -- --local-only'
 ```
 
 停止本版服务并保留数据：
 
 ```bash
-bash -o pipefail -c 'curl -fLsS --retry 3 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3/deploy/bootstrap.sh" | bash -s -- --stop'
+bash -o pipefail -c 'curl -fLsS --retry 3 --connect-timeout 60 --max-time 600 "https://raw.githubusercontent.com/yma71687-del/123/delivery-v0.5.3.1/deploy/bootstrap.sh" | bash -s -- --stop'
 ```
 
 也可解压[统一源码交付包](../deliverables/NEXUS-AD-STUDIO-0.5.3-source.zip?raw=true)并执行根目录 `bash 部署到腾讯云.sh`，使用相同固定发布。若需保留旧站点域名，必须先审核原路由与备份，不能直接覆盖。
+
+## 下载源码时出现 SSL 握手超时
+
+该错误发生在构建服务之前，因此没有 `url.txt`。修复版改用保留 TLS 校验的 curl 下载，显示真实进度；单次最多 10 分钟，连接最多 60 秒，90 秒持续低速会重试，最多 3 次。成功的源码包经固定 SHA256 校验后缓存，后续重试无需重新下载。不会删除旧目录、改动密码或其他业务。
+
+若服务器仍无法下载 GitHub：在电脑下载上方交付 ZIP，通过腾讯云终端的文件上传功能放到服务器，例如 `/home/ubuntu/NEXUS-AD-STUDIO-0.5.3-source.zip`。使用相同新版启动器并加 `--release-file /home/ubuntu/NEXUS-AD-STUDIO-0.5.3-source.zip` 即可，上传文件仍需匹配固定 SHA256。这只免去源码 ZIP 下载，镜像和 npm 等构建依赖仍需联网。
+
+实际网络与服务器上线结果仍需以终端输出为准；本机验证通过不能替代腾讯云验收。

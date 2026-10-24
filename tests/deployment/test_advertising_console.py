@@ -20,7 +20,7 @@ class AdvertisingInstaller(unittest.TestCase):
         archive=(ROOT/'deliverables'/console.RELEASE_URL.rsplit('/',1)[-1]).read_bytes()
         with tempfile.TemporaryDirectory() as tmp:
             state=Path(tmp)
-            with patch.object(console.urllib.request,'urlopen',side_effect=lambda *a,**kw:io.BytesIO(archive)):
+            with patch.object(console,'download_release',return_value=archive):
                 source=console.unpack_release(state)
                 self.assertTrue((source/'video/AdFilm.tsx').is_file())
                 self.assertTrue((source/'Dockerfile.render').is_file())

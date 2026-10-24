@@ -50,6 +50,8 @@
 - [可直接下载的完整交付包](https://raw.githubusercontent.com/yma71687-del/123/e894c7018be1b16993019f27aa107920f261454f/deliverables/NEXUS-AD-STUDIO-0.5.3-source.zip)，6797515 字节，407 个包内文件校验通过。
 - ZIP SHA256：`27dc2b3ed803b6b340275797b51ec855831baa3eb80d7548febad0c8f3471771`。
 - [真实带声字幕样片](https://raw.githubusercontent.com/yma71687-del/123/0ac9281253e083e0e6734c893cc2a04282c4bb51/deliverables/NEXUS-CAPTIONS-SHOWCASE-1080p.mp4)。
-- 版本启动器标签：`delivery-v0.5.3`；审核分支为 `codex/representative-sample`，未合并主分支，未修改腾讯云生产环境。
+- 版本启动器标签：`delivery-v0.5.3.1`（源码下载网络修复，应用仍为 0.5.3）；审核分支为 `codex/representative-sample`，未合并主分支，未修改腾讯云生产环境。
 
 ZIP 根目录的“部署到腾讯云.sh”是部署入口，使用版本标签中完成发布钉定的安装器；“完整源码”保留应用提交时的代码快照。
+
+2026-10-24 腾讯云执行反馈：旧安装器校验成功，源码 ZIP 的 Python HTTPS 握手超时；尚未进入服务构建，没有生成访问地址。已发布安装器 0.5.3.1，使用限时 curl 下载、断线重试、固定校验缓存及本机 ZIP 输入；沿用现有目录和凭据，不重置用户数据。旧 ZIP 根启动器仍指向原标签，遇到此错误请使用[最新部署命令](../deploy/ADVERTISING.md)。

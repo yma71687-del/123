@@ -17,6 +17,7 @@ import socket
 import stat
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -109,10 +110,65 @@ def acquire_lock(state):
         raise RuntimeError('另一个 NEXUS 发布进程正在运行，未并行修改') from error
     return descriptor
 
-def unpack_release(state):
+def checked_release(path):
+    descriptor=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    with os.fdopen(descriptor,'rb') as stream:
+        info=os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_size>16*1024**2:
+            raise RuntimeError('源码包必须为不超过 16 MiB 的普通 ZIP 文件')
+        data=stream.read(16*1024**2+1)
+    if len(data)>16*1024**2 or hashlib.sha256(data).hexdigest()!=RELEASE_SHA256:
+        raise RuntimeError('发布包 SHA256 校验失败，原文件保留，未构建或启动服务')
+    return data
+
+def fetch_release(url, target):
+    # Keep TLS verification enabled. curl exposes bounded connection/transfer
+    # deadlines and progress, unlike the previous single urllib handshake.
+    command=['curl','--fail','--location','--show-error','--proto','=https',
+        '--proto-redir','=https','--connect-timeout','60','--max-time','600',
+        '--speed-limit','256','--speed-time','90','--max-filesize',str(16*1024**2),
+        '--output',str(target),url]
+    try:run(command,visible=True,timeout=610)
+    except (OSError,subprocess.TimeoutExpired,RuntimeError) as error:
+        raise RuntimeError('GitHub 源码包连接或传输未完成') from error
+
+def download_release(state, release_file=None):
+    cache=state/('release-'+RELEASE_SHA256+'.zip')
+    if release_file is None and (cache.exists() or cache.is_symlink()):
+        print('复用已校验源码包，不再联网下载…',flush=True)
+        return checked_release(cache)
+    with tempfile.TemporaryDirectory(prefix='release-download-',dir=state) as temporary:
+        target=Path(temporary)/'source.zip'
+        if release_file is not None:
+            print('读取本机上传的源码包并核验 SHA256…',flush=True)
+            data=checked_release(release_file.expanduser())
+        else:
+            for attempt in range(1,4):
+                print(f'下载固定源码包（第 {attempt}/3 次；单次最多 10 分钟，90 秒持续低速即重试）…',flush=True)
+                try:fetch_release(RELEASE_URL,target)
+                except RuntimeError as error:
+                    target.unlink(missing_ok=True)
+                    if attempt==3:
+                        raise RuntimeError('GitHub 源码包下载仍失败；已有数据保留。可在电脑下载交付 ZIP、上传到服务器，再用 --release-file 指定它；无需修改密码或关闭 TLS 校验') from error
+                    print('本次网络超时或传输失败，5 秒后自动重试…',flush=True)
+                    time.sleep(5)
+                    continue
+                data=checked_release(target)
+                break
+        # Persist only verified bytes. Future retries after build/network errors
+        # do not re-download; preserve any existing invalid cache for diagnosis.
+        if cache.exists() or cache.is_symlink():
+            checked_release(cache)
+        else:
+            with target.open('wb') as stream:
+                os.fchmod(stream.fileno(),0o600)
+                stream.write(data)
+            os.replace(target,cache)
+    return data
+
+def unpack_release(state, release_file=None):
     print('下载并校验固定源码版本…',flush=True)
-    with urllib.request.urlopen(RELEASE_URL,timeout=60) as response:data=response.read(16*1024**2)
-    if hashlib.sha256(data).hexdigest()!=RELEASE_SHA256:raise RuntimeError('发布包校验失败，未构建或启动服务')
+    data=download_release(state,release_file)
     source=state/'source'
     if source.is_symlink():raise RuntimeError('源码目录是符号链接，拒绝写入')
     with ZipFile(io.BytesIO(data)) as archive:
@@ -309,6 +365,7 @@ def main():
     credentials.add_argument('--password-file',type=Path)
     credentials.add_argument('--auto-password',action='store_true',help='自动生成并复用网页密码，无需输入；仅显示在终端并保存到私有 login.json')
     parser.add_argument('--local-only',action='store_true',help='仅验证本机受保护入口，不创建公网隧道')
+    parser.add_argument('--release-file',type=Path,help='使用已上传的官方交付 ZIP，仍需匹配固定 SHA256；避免重新下载源码包')
     parser.add_argument('--stop',action='store_true',help='只停止本工具创建的 NEXUS 服务，保留数据卷')
     args=parser.parse_args()
     if not re.fullmatch(r'nexus-[a-z0-9-]{4,48}',args.project) or not 1024<=args.port<=65535:raise RuntimeError('项目名或端口无效')
@@ -340,7 +397,7 @@ def main():
         if not (state/'auth.env').exists() and password!=getpass.getpass('再次输入访问密码：'):raise RuntimeError('两次密码不一致，未部署')
     if not 12<=len(password)<=64 or len(password.encode('utf-8'))>72 or '\n' in password or '\r' in password:raise RuntimeError('访问密码需为 12–64 位单行文本，UTF-8 不超过 72 字节')
     SECRETS.append(password);before=running_containers(docker)
-    source=unpack_release(state)
+    source=unpack_release(state,args.release_file)
     run(docker+['pull',CADDY_IMAGE],visible=True)
     if args.auto_password or not (state/'auth.env').exists():
         hashed=password_hash(docker,password)
