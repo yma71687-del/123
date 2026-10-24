@@ -28,8 +28,8 @@ paths = {name: folder / f'{prefix}-{suffix}' for name, suffix in {
     'cover': 'COVER.png', 'verification': 'VERIFICATION.json'}.items()}
 if any(path.exists() for path in paths.values()):
     parser.error('Output artifacts already exist; choose another folder to preserve them')
-project = json.loads((ROOT / 'deliverables/NEXUS-MOTION-PROJECT.json').read_text())
-project = project.get('project', project)
+project = json.loads(subprocess.check_output(['node', '--import', 'tsx', '--input-type=module', '-e',
+    "import {defaultAd} from './video/schema.ts'; process.stdout.write(JSON.stringify(defaultAd));"], cwd=ROOT, text=True))
 project.update(version=2, name='NEXUS / 字幕、动画与声音实片', template='showcase', duration=15)
 project['music'] = {'enabled': True, 'gain': .42, 'assetId': None}
 project['sfx'] = [{'type': 'whoosh', 'time': .2, 'gain': .6}, {'type': 'impact', 'time': 5, 'gain': .55}, {'type': 'whoosh', 'time': 10, 'gain': .55}]
