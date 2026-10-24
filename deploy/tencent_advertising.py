@@ -22,9 +22,9 @@ import urllib.error
 import urllib.request
 from zipfile import ZipFile
 
-SOURCE = '926fb528f5002478f35732a22a2d098959ee4545'
-RELEASE_URL = 'https://raw.githubusercontent.com/yma71687-del/123/01a6a2c5b4170bbccbb00286282f7393a6ec7a5e/deliverables/NEXUS-AD-STUDIO-0.5.1-source.zip'
-RELEASE_SHA256 = 'b42ba096cf7c0edb25273c3ecffd95e852ff0a7436a6383faa88865c19ede855'
+SOURCE = '0ac9281253e083e0e6734c893cc2a04282c4bb51'
+RELEASE_URL = 'https://raw.githubusercontent.com/yma71687-del/123/05bc972cda0a169e0e5c0f7afa377d57af72f473/deliverables/NEXUS-AD-STUDIO-0.5.2-source.zip'
+RELEASE_SHA256 = 'd698eabe37b678bbe6ca1aaac865aa12381c375f6ccf8f911e05e3880d2fa648'
 CADDY_IMAGE = 'caddy@sha256:eb4d35b7452d1ab6171fbdbe8d9275b2301dad6dad92115d91e19fb9b24d510f'
 TUNNEL_IMAGE = 'cloudflare/cloudflared@sha256:faa8e0a1475f137c910be6025f43c8e4092fdd35461b31e19fd1390657a1ff39'
 OWNER = 'nexus-ad-console-v1'
@@ -224,9 +224,9 @@ def wait_gate(base, password, seconds=60):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--state-dir',type=Path,default=Path.home()/'.local/share/nexus-advertising-v051')
-    parser.add_argument('--project',default='nexus-ad-v051')
-    parser.add_argument('--port',type=int,default=43151)
+    parser.add_argument('--state-dir',type=Path,default=Path.home()/'.local/share/nexus-advertising-v052')
+    parser.add_argument('--project',default='nexus-ad-v052')
+    parser.add_argument('--port',type=int,default=43152)
     credentials=parser.add_mutually_exclusive_group()
     credentials.add_argument('--password-file',type=Path)
     credentials.add_argument('--auto-password',action='store_true',help='自动生成并复用网页密码，无需输入；仅显示在终端并保存到私有 login.json')

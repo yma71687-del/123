@@ -26,6 +26,8 @@ class AdvertisingInstaller(unittest.TestCase):
                 self.assertTrue((source/'Dockerfile.render').is_file())
                 self.assertTrue((source/'backend/reference_analysis.py').is_file())
                 self.assertTrue((source/'frontend/src/ReferenceAnalysis.tsx').is_file())
+                self.assertTrue((source/'frontend/src/CaptionEditor.tsx').is_file())
+                self.assertTrue((source/'video/CaptionOverlay.tsx').is_file())
                 self.assertEqual(console.unpack_release(state),source)
                 existing=source/'video/AdFilm.tsx';existing.write_text('local modification')
                 with self.assertRaises(RuntimeError):console.unpack_release(state)
