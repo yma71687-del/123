@@ -1,0 +1,27 @@
+{
+  "version": "0.5.4",
+  "artifact": "NEXUS-AD-WORKSPACE-0.5.4-interactive.zip",
+  "bytes": 1616567,
+  "sha256": "5df65ba990730e107d94391e1f65ab5690a1fe63a3215bc69dc22de68f6da81b",
+  "verified": [
+    "exact packaged HTML",
+    "static host then browser disconnected",
+    "real image and audio imports",
+    "actual audio playback",
+    "subtitle editing",
+    "IndexedDB save and browser restart recovery",
+    "JSON download",
+    "storage failure visible",
+    "no HTTP/WebSocket dependencies during interaction"
+  ],
+  "notAvailable": [
+    "server-side video export",
+    "cloud project save",
+    "reference video FFmpeg/OCR",
+    "AI services"
+  ],
+  "testCount": 2,
+  "testSeconds": 5.216,
+  "fileSchemeDirectVerified": false,
+  "fileSchemeNote": "Current execution environment blocks file:// navigation; exact ZIP bytes tested on a static host with network disabled."
+}
