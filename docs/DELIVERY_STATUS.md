@@ -33,3 +33,7 @@
 - 腾讯云新版上线、公网网址、固定域名及生产业务健康验收。
 
 实现路径与各参考效果差距见 [产品能力对照](PRODUCT_SCOPE.md)。本机界面包和源码可运行，不代表以上能力已完成。
+
+## 固定发布
+
+应用提交 `c39ba3b87d6d8845ca62e2c6d0e912acf673a6fc`；[完整包](https://raw.githubusercontent.com/yma71687-del/123/23fb345fe75b1768dd030cad5b8804e1f8c4575d/deliverables/NEXUS-AD-STUDIO-0.5.4-source.zip)为 9438059 字节、435 个文件逐一核验通过，SHA256 `7d9aa71fb5eac6df02d4e7d5fd3df4ed9745561251e35fa6e2501a9647104bf3`。根目录的“打开广告工作台.html”与独立试用包相同；根目录“部署到腾讯云.sh”使用固定标签 `delivery-v0.5.4` 中完成发布钉定的安装器，“完整源码”保留应用提交时的快照。
