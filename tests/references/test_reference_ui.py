@@ -45,6 +45,7 @@ class ReferenceBrowser(unittest.TestCase):
                         errors = []
                         page.on('pageerror', lambda e: errors.append(str(e)))
                         page.goto(base + '/#advertising')
+                        page.get_by_role('tab', name='参考解析', exact=True).click()
                         page.get_by_test_id('reference-upload').set_input_files(str(video))
                         page.get_by_test_id('reference-report').wait_for(timeout=30000)
                         self.assertIn('解析完成', page.get_by_test_id('reference-status').inner_text())
@@ -56,11 +57,13 @@ class ReferenceBrowser(unittest.TestCase):
                         self.assertIn('NEXUS embedded text', page.get_by_test_id('caption-import-preview').inner_text())
                         page.get_by_test_id('caption-apply-import').click()
                         self.assertEqual(page.get_by_label('字幕正文 1', exact=True).input_value(), 'NEXUS embedded text')
+                        page.get_by_role('tab', name='参考解析', exact=True).click()
                         images = page.get_by_test_id('reference-report').locator('img')
                         self.assertTrue(images.first.evaluate('(img)=>img.complete && img.naturalWidth>0'))
                         page.locator('.reference-audio audio').evaluate('(audio)=>audio.play()')
                         page.wait_for_function('()=>document.querySelector(".reference-audio audio").currentTime>0')
                         page.reload()
+                        page.get_by_role('tab', name='参考解析', exact=True).click()
                         page.get_by_test_id('reference-job').first.get_by_role('button', name='sample.mp4', exact=True).click()
                         page.get_by_test_id('reference-report').wait_for()
                         evidence = ROOT / '.test-results/references'

@@ -3,12 +3,12 @@ import {
   AbsoluteFill,
   interpolate,
   Sequence,
-  staticFile,
   useCurrentFrame,
   useVideoConfig,
   Img,
 } from "remotion";
 import { Audio } from "@remotion/media";
+import { projectMedia, builtInAudio } from "./mediaSource";
 import type { AdProps } from "./schema";
 import { CaptionOverlay } from "./CaptionOverlay";
 import { captionSafeArea } from "./captions";
@@ -189,10 +189,10 @@ function Orbit({
         >
           {project.imageAssetIds[i % project.imageAssetIds.length] ? (
             <Img
-              src={
-                assetBase +
-                project.imageAssetIds[i % project.imageAssetIds.length]
-              }
+              src={projectMedia(
+                assetBase,
+                project.imageAssetIds[i % project.imageAssetIds.length],
+              )}
               style={{
                 width: 142,
                 height: 142,
@@ -476,7 +476,7 @@ function DataScene({
       >
         {p.imageAssetIds.length > 0 && (
           <Img
-            src={assetBase + p.imageAssetIds[0]}
+            src={projectMedia(assetBase, p.imageAssetIds[0])}
             style={{
               width: 390,
               height: 420,
@@ -606,8 +606,8 @@ function Soundtrack({
           name="背景音乐"
           src={
             project.music.assetId
-              ? assetBase + project.music.assetId
-              : staticFile("audio/nexus-score.wav")
+              ? projectMedia(assetBase, project.music.assetId)
+              : builtInAudio("audio/nexus-score.wav")
           }
           loop
           volume={
@@ -626,7 +626,7 @@ function Soundtrack({
           key={i}
           name={`${event.type} / ${event.time}s`}
           from={Math.round(event.time * fps)}
-          src={staticFile(`audio/${event.type}.wav`)}
+          src={builtInAudio(`audio/${event.type}.wav`)}
           volume={event.gain}
         />
       ))}

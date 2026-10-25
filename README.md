@@ -1,8 +1,10 @@
 # NEXUS FX STUDIO
 
-**当前交付 0.5.3：[统一交付入口与完成范围](docs/DELIVERY_STATUS.md)** · [腾讯云一条命令部署](deploy/ADVERTISING.md) · [源码、样片与一键启动包](deliverables/NEXUS-AD-STUDIO-0.5.3-source.zip?raw=true)。包含真实 Remotion 广告工作台、字幕、独立声音、参考片抽帧/OCR 和实际视频导出。新增可恢复的带声示范工程、安装后自动制作与解码验收，并修复 API 与渲染器跨用户读取产品图失败。
+**直接操作：[下载广告工作台可操作试用包](deliverables/NEXUS-AD-WORKSPACE-0.5.4-interactive.zip?raw=true)**。解压后用桌面 Chrome／Edge 打开“打开广告工作台.html”。本机编辑、试听、素材导入与保存可用；云端渲染和参考解析需部署后使用。
 
-[1080p 带声字幕样片](deliverables/NEXUS-CAPTIONS-SHOWCASE-1080p.mp4?raw=true)已实际渲染；[本批测试](docs/TEST_REPORT_DELIVERY.md)提供验证记录。**腾讯云尚未部署验收，没有已确认的在线网址；AI 拆图、语音识别、智能体编排等未完成能力见完成范围。**
+**当前界面版本 0.5.4：[实际界面与操作说明](docs/WORKSPACE_0.5.4.md)** · [桌面截图](deliverables/NEXUS-WORKSPACE-DESKTOP.png) · [手机截图](deliverables/NEXUS-WORKSPACE-MOBILE.png) · [源码、样片与启动包](deliverables/NEXUS-AD-STUDIO-0.5.4-source.zip?raw=true)。新增真实悬停效果预览、分镜定位、聚焦工具面板、保存状态和逐张产品图管理。所有入口沿用真实预览、保存及视频渲染服务。
+
+[完成范围](docs/DELIVERY_STATUS.md) · [腾讯云部署说明](deploy/ADVERTISING.md) · [带声字幕样片](deliverables/NEXUS-CAPTIONS-SHOWCASE-1080p.mp4?raw=true)。用户腾讯云截图已显示旧版服务运行及 720p 出片验收通过；公网网址尚未验收，新界面尚未同步到腾讯云。AI 拆图、语音识别、智能体编排等仍未完成。
 
 **0.4.0 · 第二批：可编辑的 3D 工程**。已从单文件演示页迁移到 React + TypeScript，保留第一批真实浏览器、API、音频和导出回归。当前仍不是完整的 AI 自动广告制作平台。
 

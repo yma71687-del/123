@@ -45,10 +45,14 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             context=browser.new_context(http_credentials={'username':'nexus','password':password},viewport={'width':1700,'height':1100},accept_downloads=True)
             page=context.new_page();errors=[];page.on('pageerror',lambda error:errors.append(str(error)))
             page.goto(base+'/#advertising');page.wait_for_selector('[data-testid=ad-render]:enabled',timeout=30000)
+            page.wait_for_function("()=>[...document.querySelectorAll('.ad-effect-visual > img')].length===4 && [...document.querySelectorAll('.ad-effect-visual > img')].every(img=>img.complete && img.naturalWidth===640)")
             page.get_by_test_id('ad-headline').fill('容器实测 / 动画与声音')
+            page.get_by_role('tab',name='动画',exact=True).click()
             page.get_by_test_id('ad-duration').fill('4')
+            page.get_by_role('tab',name='导出',exact=True).click()
             page.get_by_label('分辨率').select_option('720p')
             subtitle='1\n00:00:00,000 --> 00:00:04,000\n容器内真实字幕\n'
+            page.get_by_role('tab',name='字幕',exact=True).click()
             page.get_by_test_id('caption-upload').set_input_files({'name':'容器验收.srt','mimeType':'application/x-subrip','buffer':subtitle.encode()})
             page.get_by_test_id('caption-apply-import').click()
             page.get_by_label('字幕样式').select_option('plain')
@@ -102,7 +106,7 @@ with tempfile.TemporaryDirectory(prefix='nexus-ad-docker-') as tmp:
             assert len(reference['report']['audio'])==1
             assert reference['report']['transcription']['status']=='not-connected'
             assert reference['report']['frames']
-            page.reload();page.wait_for_selector('[data-testid=reference-job]')
+            page.reload();page.get_by_role('tab',name='参考解析',exact=True).click();page.wait_for_selector('[data-testid=reference-job]')
             page.get_by_role('button',name='广告参考样片.mp4',exact=True).click()
             page.wait_for_selector('[data-testid=reference-report] img')
             page.wait_for_function('()=>{const image=document.querySelector("[data-testid=reference-report] img");return image?.complete && image.naturalWidth>0;}')

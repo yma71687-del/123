@@ -1,4 +1,5 @@
 import { OFFLINE_PREVIEW } from "./mode";
+import { AD_OFFLINE_PREVIEW } from "../../video/mediaSource";
 import { offlineAPI, offlineAssetURL, prepareOfflineAssets } from "./offline";
 import type { Asset } from "./schema";
 export const BACKUP_KEY = "nexus-project-v3"; // Preserve existing browser backups across schema migration.
@@ -12,7 +13,8 @@ export async function api<T>(
   url: string,
   options: RequestInit = {},
 ): Promise<T> {
-  if (OFFLINE_PREVIEW) return offlineAPI(url, options) as Promise<T>;
+  if (OFFLINE_PREVIEW || AD_OFFLINE_PREVIEW)
+    return offlineAPI(url, options) as Promise<T>;
   const response = await fetch(url, options);
   let body;
   try {

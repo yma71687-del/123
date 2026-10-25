@@ -38,7 +38,7 @@ class ResumeContract(unittest.TestCase):
     def invoke(self,*,local=True,protected=None,wait_error=None):
         from contextlib import ExitStack,redirect_stdout
         import io,sys
-        args=['console','--state-dir',str(self.state),'--project',self.project,'--auto-password','--resume']+(['--local-only'] if local else [])
+        args=['console','--state-dir',str(self.state),'--project',self.project,'--port','43153','--auto-password','--resume']+(['--local-only'] if local else [])
         with ExitStack() as stack:
             stack.enter_context(patch.object(sys,'argv',args))
             stack.enter_context(redirect_stdout(io.StringIO()))

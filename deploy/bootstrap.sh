@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Versioned launcher, also included at the root of the downloadable delivery.
 set -euo pipefail
-nexus_release='0.5.3.2'
+nexus_release='0.5.4'
 nexus_base="https://raw.githubusercontent.com/yma71687-del/123/delivery-v${nexus_release}/deploy"
 nexus_installer="$(mktemp /tmp/nexus-ad-installer.XXXXXX.py)"
 nexus_checksum="$(mktemp /tmp/nexus-ad-checksum.XXXXXX)"

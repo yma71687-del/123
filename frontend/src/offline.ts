@@ -1,3 +1,6 @@
+import { adSchema, defaultAd } from "../../video/schema";
+import { registerLocalMedia } from "../../video/mediaSource";
+import exampleAd from "../public/examples/nexus-motion.json";
 import {
   emptyProject,
   normalizeProject,
@@ -51,7 +54,9 @@ async function write(store: string, key: string, value: unknown) {
 function remember(assetId: string, blob: Blob) {
   const previous = urls.get(assetId);
   if (previous) URL.revokeObjectURL(previous);
-  urls.set(assetId, URL.createObjectURL(blob));
+  const url = URL.createObjectURL(blob);
+  urls.set(assetId, url);
+  registerLocalMedia("/api/assets/" + assetId, url);
 }
 export function offlineAssetURL(assetId: string) {
   const url = urls.get(assetId);
@@ -80,6 +85,37 @@ export async function offlineAPI(
   options: RequestInit = {},
 ): Promise<unknown> {
   const method = options.method ?? "GET";
+  if (url === "/examples/nexus-motion.json") return structuredClone(exampleAd);
+  if (url === "/api/assets" && method === "GET") {
+    const db = await database();
+    const stored = await new Promise<StoredAsset[]>((resolve, reject) => {
+      const tx = db.transaction("assets", "readonly");
+      const request = tx.objectStore("assets").getAll();
+      tx.oncomplete = () => resolve(request.result);
+      tx.onerror = tx.onabort = () => reject(Error("本机素材读取失败"));
+    });
+    for (const item of stored)
+      if (!urls.has(item.metadata.id)) remember(item.metadata.id, item.blob);
+    return { assets: stored.map((item) => item.metadata) };
+  }
+  if (url === "/api/advertising/health")
+    return { mode: "offline", rendering: false };
+  if (url === "/api/advertising/jobs" && method === "GET") return { jobs: [] };
+  if (url === "/api/advertising/project" && method === "GET") {
+    // Restore blob URLs before exposing a saved project's media to the player.
+    await offlineAPI("/api/assets");
+    const saved = await read<{ project: unknown }>(
+      "project",
+      "advertising-current",
+    );
+    return { project: adSchema.parse(saved?.project ?? defaultAd) };
+  }
+  if (url === "/api/advertising/project" && method === "PUT") {
+    const body = JSON.parse(String(options.body));
+    const project = adSchema.parse(body.project);
+    await write("project", "advertising-current", { project });
+    return { ok: true, saved: true };
+  }
   if (url === "/api/project" && method === "GET") {
     const saved = await read<{ project: Project }>("project", "current");
     const project = normalizeProject(saved?.project ?? emptyProject());

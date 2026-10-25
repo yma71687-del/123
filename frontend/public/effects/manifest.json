@@ -1,0 +1,202 @@
+{
+  "source": "video/AdFilm.tsx",
+  "fps": 30,
+  "records": [
+    {
+      "template": "showcase",
+      "frame": 60,
+      "width": 640,
+      "height": 360,
+      "sha256": "c41f8227e952c4869db932a40fea6fc27bfb2311e0ff2aec1f1cda12ebd5dbd9",
+      "project": {
+        "version": 2,
+        "name": "NEXUS / 科技品牌广告",
+        "template": "showcase",
+        "headline": "让创意，成为信号",
+        "tagline": "NEXUS FX STUDIO · MOTION SYSTEM",
+        "accent": "#64f4d5",
+        "duration": 15,
+        "speed": 1,
+        "radius": 1,
+        "labels": [
+          "创意",
+          "影像",
+          "品牌",
+          "设计",
+          "声音",
+          "光影",
+          "动效",
+          "未来"
+        ],
+        "imageAssetIds": [],
+        "values": [
+          36,
+          58,
+          74,
+          96
+        ],
+        "music": {
+          "enabled": false,
+          "gain": 0.25,
+          "assetId": null
+        },
+        "sfx": [],
+        "captions": {
+          "enabled": false,
+          "style": "tech",
+          "position": "bottom",
+          "fontSize": 56,
+          "color": "#ffffff",
+          "cues": []
+        }
+      }
+    },
+    {
+      "template": "cloud",
+      "frame": 60,
+      "width": 640,
+      "height": 360,
+      "sha256": "c6a13bcf3a2879559c5655c1f901148606c59ec40fb907b1cbf6b764bce2af30",
+      "project": {
+        "version": 2,
+        "name": "NEXUS / 科技品牌广告",
+        "template": "cloud",
+        "headline": "让创意，成为信号",
+        "tagline": "NEXUS FX STUDIO · MOTION SYSTEM",
+        "accent": "#64f4d5",
+        "duration": 15,
+        "speed": 1,
+        "radius": 1,
+        "labels": [
+          "创意",
+          "影像",
+          "品牌",
+          "设计",
+          "声音",
+          "光影",
+          "动效",
+          "未来"
+        ],
+        "imageAssetIds": [],
+        "values": [
+          36,
+          58,
+          74,
+          96
+        ],
+        "music": {
+          "enabled": false,
+          "gain": 0.25,
+          "assetId": null
+        },
+        "sfx": [],
+        "captions": {
+          "enabled": false,
+          "style": "tech",
+          "position": "bottom",
+          "fontSize": 56,
+          "color": "#ffffff",
+          "cues": []
+        }
+      }
+    },
+    {
+      "template": "hud",
+      "frame": 60,
+      "width": 640,
+      "height": 360,
+      "sha256": "c0cce2d8c244c0eabfa1e900cf3411b875ac1c45059b4f1eabdccf20d3676101",
+      "project": {
+        "version": 2,
+        "name": "NEXUS / 科技品牌广告",
+        "template": "hud",
+        "headline": "让创意，成为信号",
+        "tagline": "NEXUS FX STUDIO · MOTION SYSTEM",
+        "accent": "#64f4d5",
+        "duration": 15,
+        "speed": 1,
+        "radius": 1,
+        "labels": [
+          "创意",
+          "影像",
+          "品牌",
+          "设计",
+          "声音",
+          "光影",
+          "动效",
+          "未来"
+        ],
+        "imageAssetIds": [],
+        "values": [
+          36,
+          58,
+          74,
+          96
+        ],
+        "music": {
+          "enabled": false,
+          "gain": 0.25,
+          "assetId": null
+        },
+        "sfx": [],
+        "captions": {
+          "enabled": false,
+          "style": "tech",
+          "position": "bottom",
+          "fontSize": 56,
+          "color": "#ffffff",
+          "cues": []
+        }
+      }
+    },
+    {
+      "template": "grid",
+      "frame": 60,
+      "width": 640,
+      "height": 360,
+      "sha256": "57efeef250295d010a3426c576682c32c63f4ba3c1bebd7a310543c9811bdb9e",
+      "project": {
+        "version": 2,
+        "name": "NEXUS / 科技品牌广告",
+        "template": "grid",
+        "headline": "让创意，成为信号",
+        "tagline": "NEXUS FX STUDIO · MOTION SYSTEM",
+        "accent": "#64f4d5",
+        "duration": 15,
+        "speed": 1,
+        "radius": 1,
+        "labels": [
+          "创意",
+          "影像",
+          "品牌",
+          "设计",
+          "声音",
+          "光影",
+          "动效",
+          "未来"
+        ],
+        "imageAssetIds": [],
+        "values": [
+          36,
+          58,
+          74,
+          96
+        ],
+        "music": {
+          "enabled": false,
+          "gain": 0.25,
+          "assetId": null
+        },
+        "sfx": [],
+        "captions": {
+          "enabled": false,
+          "style": "tech",
+          "position": "bottom",
+          "fontSize": 56,
+          "color": "#ffffff",
+          "cues": []
+        }
+      }
+    }
+  ]
+}
