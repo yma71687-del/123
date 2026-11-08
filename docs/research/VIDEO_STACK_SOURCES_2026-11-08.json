@@ -1,0 +1,989 @@
+{
+  "date": "2026-11-08",
+  "timezone": "Asia/Shanghai",
+  "purpose": "NEXUS cinematic advertising architecture research; not installation or production deployment",
+  "method": "GitHub public repository search HTML, git ls-remote HEAD, immutable raw README/license/key source reads; API search was blocked",
+  "limitations": [
+    "No GitHub connector tools were exposed in this session",
+    "Repository documentation is not an independent feature or quality benchmark",
+    "Only two ShotCraft demo components were rendered locally",
+    "No Qwen/SAM/Wan/LTX inference was executed",
+    "No Tencent host was accessed or modified",
+    "The identity of the skill in the new Douyin reference remains unverified"
+  ],
+  "searches": [
+    {
+      "query": "remotion-skills-video",
+      "results": [
+        {
+          "repo": "Vincentwei1021/video-shotcraft",
+          "description": "AI video skill for Claude Code & Codex — cinematic, editable product promos with Remotion: 124 shot recipe cards, 150 motion previews, be…",
+          "stars_observed": 17671,
+          "updated_at": "2026-10-29T16:17:26.951Z"
+        },
+        {
+          "repo": "wshuyi/remotion-video-skill",
+          "description": "A Claude Code Skill for creating programmatic videos with Remotion framework",
+          "stars_observed": 463,
+          "updated_at": "2026-01-25T02:21:58.881Z"
+        },
+        {
+          "repo": "zhuyansen/awesome-claude-video-skills",
+          "description": "Open-source skills and toolkits that let Claude Code, Codex and other coding agents make video. 180 repos by type, each security-graded. …",
+          "stars_observed": 1717,
+          "updated_at": "2026-11-05T17:38:22.144Z"
+        },
+        {
+          "repo": "bozhouDev/video-skills-toolkit",
+          "description": "Video skills toolkit for Remotion talking-head, sketch story, and audio-to-subtitles workflows.",
+          "stars_observed": 161,
+          "updated_at": "2026-07-27T14:28:26.855Z"
+        },
+        {
+          "repo": "0xsline/OpenChatCut",
+          "description": "Open-source, local-first conversational AI video editor with a professional multi-track timeline, Agent Skills, MCP integration, and Remo…",
+          "stars_observed": 2980,
+          "updated_at": "2026-11-06T06:55:59.867Z"
+        },
+        {
+          "repo": "appariciojunior/video-editor-skills",
+          "description": "Skills that teach Claude Code to be a first-pass video editor in DaVinci Resolve: transcript cuts, vlog pacing, B-roll, music & SFX, clea…",
+          "stars_observed": 424,
+          "updated_at": "2026-10-23T07:51:07.214Z"
+        },
+        {
+          "repo": "haidrrrry/claude-remotion-skill",
+          "description": "Open-source Claude agent skill that teaches Claude Code, Claude Desktop & Claude AI to create and edit professional motion graphics videos …",
+          "stars_observed": 875,
+          "updated_at": "2026-08-12T21:05:03.230Z"
+        },
+        {
+          "repo": "OpenMontageInc/OpenMontage",
+          "description": "World's first open-source, agentic video production system. 12 production pipelines, 100+ tools, 700+ agent skill and production-knowledg…",
+          "stars_observed": 78347,
+          "updated_at": "2026-11-08T03:50:57.935Z"
+        },
+        {
+          "repo": "iart-ai/motion-skills",
+          "description": "50 open-source skills that teach your AI coding agent to make motion graphics, animation & video — kinetic typography, data-viz, explaine…",
+          "stars_observed": 1278,
+          "updated_at": "2026-10-25T14:18:33.712Z"
+        },
+        {
+          "repo": "Vincentwei1021/video-talkcraft",
+          "description": "Agent skill that turns Claude Code / Codex into a motion-design studio for voiceover-driven explainer videos — word-level voiceover sync,…",
+          "stars_observed": 2179,
+          "updated_at": "2026-10-12T05:29:10.288Z"
+        }
+      ]
+    },
+    {
+      "query": "AI-product-video-skill",
+      "results": [
+        {
+          "repo": "Pluviobyte/video-production-skills",
+          "description": "Reusable AI video production skills library for creation, recreation, motion design, openers, and QA.",
+          "stars_observed": 702,
+          "updated_at": "2026-07-14T02:28:53.272Z"
+        },
+        {
+          "repo": "Vincentwei1021/video-shotcraft",
+          "description": "AI video skill for Claude Code & Codex — cinematic, editable product promos with Remotion: 124 shot recipe cards, 150 motion previews, be…",
+          "stars_observed": 17671,
+          "updated_at": "2026-10-29T16:17:26.951Z"
+        },
+        {
+          "repo": "speechlab0210/video-production-skill",
+          "description": "The complete video-production skill behind the 蝦說 AI channel — lets an AI agent autonomously produce narrated educational videos (slides …",
+          "stars_observed": 105,
+          "updated_at": "2026-07-03T15:22:03.741Z"
+        },
+        {
+          "repo": "SupercmoHQ/superCMO-skills",
+          "description": "Open-source skills that empower any AI agent (Claude, Cursor, Hermes, etc.) to generate end-to-end marketing campaigns - UGC videos, ad v…",
+          "stars_observed": 296,
+          "updated_at": "2026-10-21T12:24:13.064Z"
+        },
+        {
+          "repo": "MatrixReligio/ProductVideoCreator",
+          "description": "AI Agent Skills toolkit for automated product introduction video generation with Remotion, Playwright, and edge-tts",
+          "stars_observed": 44,
+          "updated_at": "2026-06-22T13:44:10.406Z"
+        },
+        {
+          "repo": "HiAPIAI/awesome-ai-video-workflows",
+          "description": "Awesome AI product video workflows: turn product images into ecommerce video ads, UGC ads, product launch videos, TikTok, Reels, Shorts, …",
+          "stars_observed": 23,
+          "updated_at": "2026-11-04T02:14:04.405Z"
+        },
+        {
+          "repo": "Chase-Zzx/product-ad-video-generator",
+          "description": "🎬 产品广告视频生成器 Coze Skill - AI 数字人 + 火山引擎 TTS + 即梦视频生成",
+          "stars_observed": 56,
+          "updated_at": "2026-01-28T02:16:19.199Z"
+        },
+        {
+          "repo": "Aaryan-Kapoor/video-production-skill",
+          "description": "Turn an AI agent into a full-stack educational video producer: research, storyboard, narration, animated visuals, render, QC, archive, an…",
+          "stars_observed": 17,
+          "updated_at": "2026-07-09T19:51:39.266Z"
+        },
+        {
+          "repo": "per-simmons/launch-video-clone",
+          "description": "A Claude Code skill for making product launch videos in HyperFrames that don't look AI-made: original or cloned from a reference.",
+          "stars_observed": 21,
+          "updated_at": "2026-11-03T20:05:31.736Z"
+        },
+        {
+          "repo": "ReScienceLab/super-prototyping",
+          "description": "A product-validation system for AI agents: idea → logo → product → brand → launch video in two hours. Desktop app + skills for Claude Cod…",
+          "stars_observed": 92,
+          "updated_at": "2026-11-02T17:27:57.234Z"
+        }
+      ]
+    },
+    {
+      "query": "AI-video-agent-cinematic",
+      "results": [
+        {
+          "repo": "mediastormDev/dream-to-video-skill",
+          "description": "AI agent skill that transforms dream descriptions into cinematic videos — auto-generates prompts, submits to Jimeng via browser automatio…",
+          "stars_observed": 377,
+          "updated_at": "2026-03-23T05:42:27.111Z"
+        },
+        {
+          "repo": "ChrisChen667788/wind-comic",
+          "description": "Multi-agent AI pipeline that turns one line of text into a finished short-form drama: script, cinematic storyboards, character-consistent v…",
+          "stars_observed": 706,
+          "updated_at": "2026-11-07T10:23:07.536Z"
+        },
+        {
+          "repo": "Orva-Studio/hance",
+          "description": "Film-grade your footage from the command line - built for humans and agents.",
+          "stars_observed": 83,
+          "updated_at": "2026-10-08T17:22:57.963Z"
+        },
+        {
+          "repo": "tapankumarpatro/openframe-ai",
+          "description": "Open-source multi-agent AI video ad engine — 7 agents, 15+ video models, visual canvas. Turn a prompt into a cinematic ad",
+          "stars_observed": 29,
+          "updated_at": "2026-07-01T06:03:58.578Z"
+        },
+        {
+          "repo": "Arnie936/higgsfield-website-skill",
+          "description": "Claude Code Skill: cinematic AI-video websites (Higgsfield MCP, Seedance 2.0) - agents-first setup",
+          "stars_observed": 22,
+          "updated_at": "2026-07-17T17:03:35.973Z"
+        },
+        {
+          "repo": "pengchengneo/AgentCine",
+          "description": "AgentCine 是一个面向 AI 漫剧/短剧创作的全流程工业级工作台，支持从文本分析、角色场景资产管理到分镜、配音与视频生成的统一协作。 AgentCine is an end-to-end workspace for AI-powered cinematic crea…",
+          "stars_observed": 51,
+          "updated_at": "2026-04-02T05:04:07.612Z"
+        },
+        {
+          "repo": "hassanrauf1/Generate-AI-Viral-Videos-with-Seedance-and-Upload-to-TikTok-YouTube-Instagram",
+          "description": "End to end AI agent that generates cinematic ASMR style short videos using GPT-4, Seedance, Fal AI, and Blotato and uploads them automati…",
+          "stars_observed": 25,
+          "updated_at": "2025-07-20T15:15:51.728Z"
+        },
+        {
+          "repo": "NSK-394/ai-video-agent",
+          "description": "Autonomous AI video editing system — analyzes reference videos and recreates their editing style in DaVinci Resolve using beat-sync, sema…",
+          "stars_observed": 6,
+          "updated_at": "2026-05-15T11:41:46.089Z"
+        },
+        {
+          "repo": "memex-lab/product-launch-video-skill",
+          "description": "AI agent skill for creating cinematic product launch videos with Remotion",
+          "stars_observed": 26,
+          "updated_at": "2026-06-01T09:25:16.347Z"
+        },
+        {
+          "repo": "syklayou-glitch/video-shotcraft",
+          "description": "An AI agent skill for crafting cinematic product videos with Remotion: 152 shot recipe cards, 2.5D camera moves, beat-synced cuts, and fi…",
+          "stars_observed": 11,
+          "updated_at": "2026-08-26T05:54:29.778Z"
+        }
+      ]
+    }
+  ],
+  "repositories": [
+    {
+      "repo": "0xsline/OpenChatCut",
+      "commit": "9242a95aea248ff3a8dab495514384e858320d47",
+      "sources": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/0xsline/OpenChatCut/9242a95aea248ff3a8dab495514384e858320d47/README.md",
+          "bytes": 33990,
+          "sha256": "b7ab451a637bd146733a12b9f9fca56b8447fed667e52a4e0055474dbf116d9b"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/0xsline/OpenChatCut/9242a95aea248ff3a8dab495514384e858320d47/LICENSE",
+          "bytes": 34523,
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/0xsline/OpenChatCut/9242a95aea248ff3a8dab495514384e858320d47/package.json",
+          "bytes": 43018,
+          "sha256": "ab5bb3151ab4f2d7e998dfd9d9eeaff006d6e0f1890834854404c170658927ec"
+        }
+      ]
+    },
+    {
+      "repo": "AIDC-AI/Pixelle-Video",
+      "commit": "848b054e4fae40dabc62ec58e960b573e83793ac",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/AIDC-AI/Pixelle-Video/848b054e4fae40dabc62ec58e960b573e83793ac/README.md",
+          "bytes": 20845,
+          "sha256": "1a6e9c26be45d679eea7041208e0620727f83db82d5f3c710108a1246b654093"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/AIDC-AI/Pixelle-Video/848b054e4fae40dabc62ec58e960b573e83793ac/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ]
+    },
+    {
+      "repo": "appariciojunior/video-editor-skills",
+      "commit": "6709678d7d5b169149e13480428e12b0f09a47f0",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/appariciojunior/video-editor-skills/6709678d7d5b169149e13480428e12b0f09a47f0/README.md",
+          "bytes": 3349,
+          "sha256": "e570ebab8610ee41424bd427f8fc12e14ab9b95b6a2d9811d8d4acc6f7f06905"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/appariciojunior/video-editor-skills/6709678d7d5b169149e13480428e12b0f09a47f0/LICENSE",
+          "bytes": 20067,
+          "sha256": "aa2d89d6b5ddb8730f2c3da68dd0da463d9a7b41eb18b30418b013d49f74494d"
+        }
+      ]
+    },
+    {
+      "repo": "blender/blender",
+      "commit": "9c4fc4363b03d30e576d76b86420b929f1e18465",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/blender/blender/9c4fc4363b03d30e576d76b86420b929f1e18465/README.md",
+          "bytes": 1234,
+          "sha256": "1bbb333e5196ba3d5cdc42830e5f1db6b77c311da96d4ff4d9a6f8143d9821e1"
+        },
+        {
+          "kind": "license",
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/blender/blender/9c4fc4363b03d30e576d76b86420b929f1e18465/COPYING",
+          "bytes": 302,
+          "sha256": "19e6f4b541772f9d7b98a52bdbca3ebd5ef9e404956a9a6de68bfc3c1a178387"
+        },
+        {
+          "path": "doc/license/GPL-license.txt",
+          "url": "https://raw.githubusercontent.com/blender/blender/9c4fc4363b03d30e576d76b86420b929f1e18465/doc/license/GPL-license.txt",
+          "bytes": 17992,
+          "sha256": "f2703dec1b0118070caabd3302e21738c00211b0cc3260dbeb1168d6eda726b7"
+        }
+      ]
+    },
+    {
+      "repo": "Breakthrough/PySceneDetect",
+      "commit": "f1ae68409725440fc406acd76f1ea78a3128d99a",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/Breakthrough/PySceneDetect/f1ae68409725440fc406acd76f1ea78a3128d99a/README.md",
+          "bytes": 7770,
+          "sha256": "ff45f6f05b01cfd5e6e796e494e5fb5ee83741925da7b6485d4a18c53b755ba7"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/Breakthrough/PySceneDetect/f1ae68409725440fc406acd76f1ea78a3128d99a/LICENSE",
+          "bytes": 1505,
+          "sha256": "e855ca89e457a7d0b6b7c92ad475d1120a9a5b5bf4e5048c706b1b3889fbc349"
+        }
+      ]
+    },
+    {
+      "repo": "Comfy-Org/ComfyUI",
+      "commit": "bdb0816a292d221efeb6ec4ae41bcdff3f91fc86",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/Comfy-Org/ComfyUI/bdb0816a292d221efeb6ec4ae41bcdff3f91fc86/README.md",
+          "bytes": 29314,
+          "sha256": "1f5452375de6170925930393ade6380f73a01974d00c7e784d1521a86e5b388a"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/Comfy-Org/ComfyUI/bdb0816a292d221efeb6ec4ae41bcdff3f91fc86/LICENSE",
+          "bytes": 35149,
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+        },
+        {
+          "kind": "extra",
+          "path": "script_examples/basic_api_example.py",
+          "url": "https://raw.githubusercontent.com/Comfy-Org/ComfyUI/bdb0816a292d221efeb6ec4ae41bcdff3f91fc86/script_examples/basic_api_example.py",
+          "bytes": 2830,
+          "sha256": "8bf77cd877f989445ca317efab08ae72c36071a2839bf1f0fc992e5907b005ec"
+        }
+      ]
+    },
+    {
+      "repo": "danielgatis/rembg",
+      "commit": "991927b77667946dab59c50df31f7d4640e80457",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/danielgatis/rembg/991927b77667946dab59c50df31f7d4640e80457/README.md",
+          "bytes": 27523,
+          "sha256": "e2511867ce56f41ad7fb83e2cb8f07e868712089ae6d16fdc55414a36e820882"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE.txt",
+          "url": "https://raw.githubusercontent.com/danielgatis/rembg/991927b77667946dab59c50df31f7d4640e80457/LICENSE.txt",
+          "bytes": 1069,
+          "sha256": "90a3215072968fd304669c5389f04f1274a587abdd0507d99dead0f5511f8999"
+        }
+      ]
+    },
+    {
+      "repo": "designcombo/react-video-editor",
+      "commit": "9a8c5296da4b258f66dfb7ad73de96be62478bca",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/designcombo/react-video-editor/9a8c5296da4b258f66dfb7ad73de96be62478bca/README.md",
+          "bytes": 3090,
+          "sha256": "09be5207565225a429e1d907b1cc113c30850898de0dd8d0b78062434d922bcc"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/designcombo/react-video-editor/9a8c5296da4b258f66dfb7ad73de96be62478bca/LICENSE",
+          "bytes": 2617,
+          "sha256": "633eb336c865e0a577bddb880654bd656ed3ed173fefb55e4590cc791ee87212"
+        },
+        {
+          "kind": "extra",
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/designcombo/react-video-editor/9a8c5296da4b258f66dfb7ad73de96be62478bca/package.json",
+          "bytes": 2242,
+          "sha256": "e1404f7ffc557958d973edfe35b009d9fab426f61a9ad91ac49398cfd77d7989"
+        }
+      ]
+    },
+    {
+      "repo": "facebookresearch/sam3",
+      "commit": "f1647e8d0c1d280991f4d1b7d974c2704537fe66",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam3/f1647e8d0c1d280991f4d1b7d974c2704537fe66/README.md",
+          "bytes": 21417,
+          "sha256": "da3dd047d18ef9a4b33557bf6f8187cf166218dc8aef40f2e18a67cc5249a502"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/facebookresearch/sam3/f1647e8d0c1d280991f4d1b7d974c2704537fe66/LICENSE",
+          "bytes": 7353,
+          "sha256": "4dea99bfaa016e21bc860d73f344236bd1e5c4977d1a9a8fd32f822b500ae1be"
+        }
+      ]
+    },
+    {
+      "repo": "FFmpeg/FFmpeg",
+      "commit": "2bf291526e50480d2c355b4c6c8dd04863212aa1",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/2bf291526e50480d2c355b4c6c8dd04863212aa1/README.md",
+          "bytes": 2026,
+          "sha256": "86474c8f0806772f831a9c7a4982fd2398507372c577d229b76f60bbb3e7dead"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE.md",
+          "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/2bf291526e50480d2c355b4c6c8dd04863212aa1/LICENSE.md",
+          "bytes": 4352,
+          "sha256": "e6dc72d5665a1ebd6dcc841de59278dad4ca77ecc47b03f1064a55c3e9ea8bb8"
+        }
+      ]
+    },
+    {
+      "repo": "harry0703/MoneyPrinterTurbo",
+      "commit": "c235354804104665b58679223847f78c2b5e27d4",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/harry0703/MoneyPrinterTurbo/c235354804104665b58679223847f78c2b5e27d4/README.md",
+          "bytes": 39463,
+          "sha256": "b2e1ef65da546c9a971992b67cd7a6a63f58b7bc0910165b392d25df1eb60b48"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/harry0703/MoneyPrinterTurbo/c235354804104665b58679223847f78c2b5e27d4/LICENSE",
+          "bytes": 1061,
+          "sha256": "87dd19b6a0779e14a91c1b06423ef251df37e89666160c031130a26bae68c229"
+        }
+      ]
+    },
+    {
+      "repo": "iart-ai/motion-skills",
+      "commit": "238dfc55aac123d4649be39adfe58c43193ca349",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/iart-ai/motion-skills/238dfc55aac123d4649be39adfe58c43193ca349/README.md",
+          "bytes": 5827,
+          "sha256": "999240ee86075dbb2dbd97f86ff6da1556eba0c449eb11b12d25fcd17a169fa1"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/iart-ai/motion-skills/238dfc55aac123d4649be39adfe58c43193ca349/LICENSE",
+          "bytes": 1064,
+          "sha256": "33d6cd35a20903b5e968a76a1e584a7aeae2c83e3e58ea58ecc50b889b83e668"
+        }
+      ]
+    },
+    {
+      "repo": "Lightricks/LTX-2",
+      "commit": "4f521619ae0029e8fbb64d555030c2b121a33b4f",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/Lightricks/LTX-2/4f521619ae0029e8fbb64d555030c2b121a33b4f/README.md",
+          "bytes": 20846,
+          "sha256": "523236c990efd133a9e70ef7fe0c97e0d5ced5995c22f1e67453134491f0328d"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/Lightricks/LTX-2/4f521619ae0029e8fbb64d555030c2b121a33b4f/LICENSE",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "kind": "extra",
+          "path": "LICENSE-2",
+          "url": "https://raw.githubusercontent.com/Lightricks/LTX-2/4f521619ae0029e8fbb64d555030c2b121a33b4f/LICENSE-2",
+          "bytes": 19197,
+          "sha256": "c325da090976a313b214bf0d6a1738003b96505c01c46043e80edc200a72c147"
+        },
+        {
+          "kind": "extra",
+          "path": "LICENSE-2_x",
+          "url": "https://raw.githubusercontent.com/Lightricks/LTX-2/4f521619ae0029e8fbb64d555030c2b121a33b4f/LICENSE-2_x",
+          "bytes": 35945,
+          "sha256": "58e2990d582d68c369b3cf49a809806bd372c42b91bf991f6dd1894a6f46b5aa"
+        },
+        {
+          "kind": "extra",
+          "path": "packages/ltx-pipelines/docs/installation.md",
+          "url": "https://raw.githubusercontent.com/Lightricks/LTX-2/4f521619ae0029e8fbb64d555030c2b121a33b4f/packages/ltx-pipelines/docs/installation.md",
+          "bytes": 9742,
+          "sha256": "7da9d877f5b47957db3ba8b78793989dd3ed6a020ed7bab2cd51f8ba4c8a48cf"
+        }
+      ]
+    },
+    {
+      "repo": "m-bain/whisperX",
+      "commit": "5d3678b8535698a2826a5db9eb3e4105aef85dd9",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/m-bain/whisperX/5d3678b8535698a2826a5db9eb3e4105aef85dd9/README.md",
+          "bytes": 16507,
+          "sha256": "98ebee691ebee0ca5bdd9257dad72e1e74a9c216ff3adb7fa68d5164007a84ea"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/m-bain/whisperX/5d3678b8535698a2826a5db9eb3e4105aef85dd9/LICENSE",
+          "bytes": 1297,
+          "sha256": "cddc25bce26226b4a04ed12839d9006b7a4403da9020ef6428ef7282a6567441"
+        }
+      ]
+    },
+    {
+      "repo": "memex-lab/product-launch-video-skill",
+      "commit": "9de027d1947ce8f8b60ccf70aa89e482bf80ecea",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/memex-lab/product-launch-video-skill/9de027d1947ce8f8b60ccf70aa89e482bf80ecea/README.md",
+          "bytes": 4683,
+          "sha256": "8c79c06945ef720243c0ef5291062bf37d8be955f6331f576b69309f995795f4"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/memex-lab/product-launch-video-skill/9de027d1947ce8f8b60ccf70aa89e482bf80ecea/LICENSE",
+          "bytes": 1066,
+          "sha256": "770d02ca715c6ca65f2fe51d05a121ff677fa07b26328940c64c85a83015a770"
+        },
+        {
+          "path": "skills/product-launch-video/SKILL.md",
+          "url": "https://raw.githubusercontent.com/memex-lab/product-launch-video-skill/9de027d1947ce8f8b60ccf70aa89e482bf80ecea/skills/product-launch-video/SKILL.md",
+          "bytes": 48618,
+          "sha256": "7608467709e563fe201ae9e4f4e32d7515c9605b91510dc8baaefccb5f16ee85"
+        }
+      ]
+    },
+    {
+      "repo": "motion-canvas/motion-canvas",
+      "commit": "7b91435c301d530351dcf5ebb91dd139c002e405",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/motion-canvas/motion-canvas/7b91435c301d530351dcf5ebb91dd139c002e405/README.md",
+          "bytes": 5266,
+          "sha256": "9895daa20be79849a312b5cb5b9ed36db2d1a6dfe9731b5e53a67b222abe9cd9"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/motion-canvas/motion-canvas/7b91435c301d530351dcf5ebb91dd139c002e405/LICENSE",
+          "bytes": 1070,
+          "sha256": "b3f12201916c5d478263cd210cf17f3d0c007d03bd574e0b77cac6307953068e"
+        }
+      ]
+    },
+    {
+      "repo": "OpenCut-app/OpenCut",
+      "commit": "e668010778568641babef2cc40be4703ae6916d6",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/OpenCut-app/OpenCut/e668010778568641babef2cc40be4703ae6916d6/README.md",
+          "bytes": 2661,
+          "sha256": "95ccfeb63ebca77afdde080e2923b5f29b680db6b42a9be8b9098ea7ba25c050"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/OpenCut-app/OpenCut/e668010778568641babef2cc40be4703ae6916d6/LICENSE",
+          "bytes": 1060,
+          "sha256": "05ab02fd3151198e3c0a698a3b7abfa6149c7bec26230f47c80c4dc5b6dc263f"
+        }
+      ]
+    },
+    {
+      "repo": "opencut-app/opencut-classic",
+      "commit": "cf5e79e919144200294fb9fed22a222592a0aeea",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/opencut-app/opencut-classic/cf5e79e919144200294fb9fed22a222592a0aeea/README.md",
+          "bytes": 4909,
+          "sha256": "2907b0a13d894d4e851068f230be0b790ed9889aa9f2b84192b802c2d955ef12"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/opencut-app/opencut-classic/cf5e79e919144200294fb9fed22a222592a0aeea/LICENSE",
+          "bytes": 1067,
+          "sha256": "8117f9bb64534f7530fc6139b014fd1c1465f7981f93d1871789150fa3f59d3d"
+        },
+        {
+          "kind": "extra",
+          "path": "apps/web/package.json",
+          "url": "https://raw.githubusercontent.com/opencut-app/opencut-classic/cf5e79e919144200294fb9fed22a222592a0aeea/apps/web/package.json",
+          "bytes": 3275,
+          "sha256": "29bdaa4e14c580af0eaf5f7dd6807288ffb532b87906f9c1c7e2a41b75e8e271"
+        }
+      ]
+    },
+    {
+      "repo": "OpenMontageInc/OpenMontage",
+      "commit": "356b5fa92474998c9f9a0782fd5547d05837d284",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/OpenMontageInc/OpenMontage/356b5fa92474998c9f9a0782fd5547d05837d284/README.md",
+          "bytes": 44055,
+          "sha256": "f69062655b71ff0291a32c405385ed83664c83b51f07735e833ff6d051785547"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/OpenMontageInc/OpenMontage/356b5fa92474998c9f9a0782fd5547d05837d284/LICENSE",
+          "bytes": 34523,
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+        },
+        {
+          "path": "docs/ARCHITECTURE.md",
+          "url": "https://raw.githubusercontent.com/OpenMontageInc/OpenMontage/356b5fa92474998c9f9a0782fd5547d05837d284/docs/ARCHITECTURE.md",
+          "bytes": 26696,
+          "sha256": "bde98c5fdc0311a07a16445b9c98caed5299c965bb9aae1f1b0dac95a9e30804"
+        },
+        {
+          "path": "docs/PROVIDERS.md",
+          "url": "https://raw.githubusercontent.com/OpenMontageInc/OpenMontage/356b5fa92474998c9f9a0782fd5547d05837d284/docs/PROVIDERS.md",
+          "bytes": 73467,
+          "sha256": "cff94c14ae438138813502fa8d79079ea0401d4a9a9a4e2bc471ceecda2bf56c"
+        }
+      ]
+    },
+    {
+      "repo": "pengchengneo/AgentCine",
+      "commit": "2bb30b6ade98d90324ca5a0c6f0ea860f6a22875",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/pengchengneo/AgentCine/2bb30b6ade98d90324ca5a0c6f0ea860f6a22875/README.md",
+          "bytes": 12244,
+          "sha256": "589943f67ec34e13541f5fd86a070ed17b2589bbe568985260507dcead5361b8"
+        }
+      ]
+    },
+    {
+      "repo": "pmndrs/react-three-fiber",
+      "commit": "d74622ea8ed717f7212d7e19d65ff3e325508389",
+      "sources": [
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/pmndrs/react-three-fiber/d74622ea8ed717f7212d7e19d65ff3e325508389/LICENSE",
+          "bytes": 1072,
+          "sha256": "9c35b5de7b7493a707fffe4eb23bd2f7f449153c1911f7c6eefb4e591fd5349a"
+        }
+      ]
+    },
+    {
+      "repo": "QwenLM/Qwen-Image-Layered",
+      "commit": "54c4fe47e76d745775e03fc66ee38457280ed9ea",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Image-Layered/54c4fe47e76d745775e03fc66ee38457280ed9ea/README.md",
+          "bytes": 7589,
+          "sha256": "fdb63812e595f581d9edb46501cf84ef36403e327f0f90f8d01bff4ea3a0fd32"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Image-Layered/54c4fe47e76d745775e03fc66ee38457280ed9ea/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "kind": "extra",
+          "path": "src/app.py",
+          "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Image-Layered/54c4fe47e76d745775e03fc66ee38457280ed9ea/src/app.py",
+          "bytes": 8843,
+          "sha256": "0004db967c3125c9f1cecc669b0156af443540b2702b845ca4de297b33a5313f"
+        }
+      ]
+    },
+    {
+      "repo": "remotion-dev/remotion",
+      "commit": "5dee2b6b14f7f0cebb040b7d92b0097b6be582a9",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/remotion-dev/remotion/5dee2b6b14f7f0cebb040b7d92b0097b6be582a9/README.md",
+          "bytes": 4618,
+          "sha256": "4c6717ce4a4f556300edf18cb8c64965786754649889353599b3435810268e58"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE.md",
+          "url": "https://raw.githubusercontent.com/remotion-dev/remotion/5dee2b6b14f7f0cebb040b7d92b0097b6be582a9/LICENSE.md",
+          "bytes": 2823,
+          "sha256": "bd65083b940f61904f6ef298aade918a7cad72a3e35bc406e36fab365844b673"
+        }
+      ]
+    },
+    {
+      "repo": "remotion-dev/skills",
+      "commit": "a2824c67f8b4585c294a8101db9f9f0ad3c643f8",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/remotion-dev/skills/a2824c67f8b4585c294a8101db9f9f0ad3c643f8/README.md",
+          "bytes": 3024,
+          "sha256": "79241f8ff6e82d0e9e9976cac579ed86b05d3e63527ce7493b5081a8c38a0f2e"
+        }
+      ]
+    },
+    {
+      "repo": "SYSTRAN/faster-whisper",
+      "commit": "846467d436117e44d54ad74f555d85c75834edb0",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/SYSTRAN/faster-whisper/846467d436117e44d54ad74f555d85c75834edb0/README.md",
+          "bytes": 15249,
+          "sha256": "43efe4a6eb9046d5ba4dcdcf2abcc27ad9e021f3edfc00bd6eb4913a9abe065b"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/SYSTRAN/faster-whisper/846467d436117e44d54ad74f555d85c75834edb0/LICENSE",
+          "bytes": 1064,
+          "sha256": "af6798135e729f8aa6c853936d037dfdea449734d26b8ea6a89805fca758c0d5"
+        }
+      ]
+    },
+    {
+      "repo": "Vincentwei1021/video-shotcraft",
+      "commit": "1266a3ec4831289c4d893d42dd5102723658039a",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/README.md",
+          "bytes": 19738,
+          "sha256": "86544700f66ad9574d8d4a0624638f4a2e0671dc6ed5dca750159cf5d2cf2cd5"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/LICENSE",
+          "bytes": 11340,
+          "sha256": "b2ce9877a55547ada9b870150664d1468ff777e67cc9888806a73927d31c5771"
+        },
+        {
+          "kind": "skill",
+          "path": "SKILL.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/SKILL.md",
+          "bytes": 21745,
+          "sha256": "9e6b2d68f50cae3d5405178d35d2bd305ee2045691fa726b63bae3ab8bb62e6b"
+        },
+        {
+          "path": "workbench/package.json",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/workbench/package.json",
+          "bytes": 1390,
+          "sha256": "f2c7d01bd4bdc24c45b4c9304d110ddef1351d12222c7a495c37f276c880a475"
+        },
+        {
+          "path": "workbench/README.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/workbench/README.md",
+          "bytes": 8717,
+          "sha256": "72789cc18b7b7958868fd48abb710a6cc2e8425af7c48f7609f092211560451b"
+        },
+        {
+          "path": "workbench/GUIDE.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/workbench/GUIDE.md",
+          "bytes": 7691,
+          "sha256": "cf05c67f7e5ab19660b0bd764ba7c7c30a4d42792f4bd9cd28a47dc9a50843bc"
+        },
+        {
+          "path": "references/workbench.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/references/workbench.md",
+          "bytes": 13212,
+          "sha256": "46ee47b730ba81cd3e1a56f759d2d5dde250bd97a452a4e141e6fb1381ee7284"
+        },
+        {
+          "path": "references/pipeline.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/references/pipeline.md",
+          "bytes": 23930,
+          "sha256": "2e09dd100f77c40d7f27edbf29a7e46a2fc72ba1eaabe17a3ee2cb43c6036bb6"
+        },
+        {
+          "path": "assets/audio/ATTRIBUTION.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/assets/audio/ATTRIBUTION.md",
+          "bytes": 1184,
+          "sha256": "6e2ab53afde1b882b6c562e1b068c71ae2385cf4166662bc23e731421aa944e6"
+        },
+        {
+          "path": "template/package.json",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/template/package.json",
+          "bytes": 476,
+          "sha256": "4291a904d7575ec0b1fc536fd3f5e6d1841b36d49a0b39f5a4546a43a8d28a26"
+        },
+        {
+          "path": "demos/README.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/demos/README.md",
+          "bytes": 8413,
+          "sha256": "c658e80f55271316b05fb599ecaed282754e11b712ff77c07642304aebae3a0a"
+        },
+        {
+          "path": "workbench/src/types.ts",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/workbench/src/types.ts",
+          "bytes": 2277,
+          "sha256": "8086fb5e0f4909d4885746307715da7bcf67d5b1f4a9f630bc5763e9972516f5"
+        },
+        {
+          "path": "workbench/src/preview/Composition.tsx",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/workbench/src/preview/Composition.tsx",
+          "bytes": 3281,
+          "sha256": "2aebbbf17912ccfbdd518a62907aea223a52ee869a8aa39d5f85a701d9038d49"
+        },
+        {
+          "path": "workbench/vite.config.ts",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/workbench/vite.config.ts",
+          "bytes": 8641,
+          "sha256": "22553b122154747072f66b164f10a76a60d60709ba2a5c6ddbd7f497e166118a"
+        },
+        {
+          "path": "workbench/src/store.ts",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/workbench/src/store.ts",
+          "bytes": 11726,
+          "sha256": "b3cb1bf1e57989bfb7b5f5c114a6bfdc37b5112cab795a87a0f0032205f9b564"
+        },
+        {
+          "path": "demos/typography/flying-words/FlyingWords.tsx",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/demos/typography/flying-words/FlyingWords.tsx",
+          "bytes": 10326,
+          "sha256": "94d7327be1e42d2a4d76bcf7494272fe5564178112e9b2e7f76f3f99cfc00366"
+        },
+        {
+          "path": "demos/camera/space-camera-moves/ExplodedView.tsx",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/demos/camera/space-camera-moves/ExplodedView.tsx",
+          "bytes": 20787,
+          "sha256": "1e33668457721ab90f8d99135dd5d44fd508a20ca0b573f195b790bf5f60706e"
+        },
+        {
+          "path": "references/shots/camera/space-camera-moves.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/references/shots/camera/space-camera-moves.md",
+          "bytes": 4480,
+          "sha256": "69b8c433cbd92ea073b84922cfae7a2c541f31df73cb54d2a115c3116b3f1fba"
+        },
+        {
+          "path": "references/shots/typography/flying-words.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/references/shots/typography/flying-words.md",
+          "bytes": 5449,
+          "sha256": "5a5ae0a822719cc75fe810554ee0c4f5e4d4008a4fed32bc8641065e0d307e83"
+        },
+        {
+          "path": "demos/_fixtures/Look.tsx",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/demos/_fixtures/Look.tsx",
+          "bytes": 18440,
+          "sha256": "88b97d49a5489126eaaaff2269d02fd491ccbd7f13f3e1d6df764a592635ae28"
+        },
+        {
+          "path": "demos/_fixtures/Polish.tsx",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/demos/_fixtures/Polish.tsx",
+          "bytes": 13719,
+          "sha256": "21dfe2f36325c07ccaa1a619007e24a2b5b3d6a82030d3c1772de902551c2842"
+        },
+        {
+          "path": "demos/_fixtures/Brand.tsx",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/1266a3ec4831289c4d893d42dd5102723658039a/demos/_fixtures/Brand.tsx",
+          "bytes": 6181,
+          "sha256": "7c2e412276a860605737952143050f2a316dfc95a5bd6ad4c517ebf52ee5adf4"
+        }
+      ]
+    },
+    {
+      "repo": "Vincentwei1021/video-talkcraft",
+      "commit": "a7c29edfb2404612dde6a5a1c8aa94232e85625b",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-talkcraft/a7c29edfb2404612dde6a5a1c8aa94232e85625b/README.md",
+          "bytes": 20216,
+          "sha256": "63aca232f209db300476c889891e0d53566a746ac2074f0a6cafc68b6b76a8d8"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-talkcraft/a7c29edfb2404612dde6a5a1c8aa94232e85625b/LICENSE",
+          "bytes": 4895,
+          "sha256": "ebe8b7ad95a04a78e6f233db4ffcfa2c03a1d8cfa2c49d537658b36e81603b7c"
+        },
+        {
+          "kind": "skill",
+          "path": "SKILL.md",
+          "url": "https://raw.githubusercontent.com/Vincentwei1021/video-talkcraft/a7c29edfb2404612dde6a5a1c8aa94232e85625b/SKILL.md",
+          "bytes": 62221,
+          "sha256": "f813fdeb45ec61e7b453e2f51205f6eb9a1e29a8999cbd6f5b47907fefbe390c"
+        }
+      ]
+    },
+    {
+      "repo": "Wan-Video/Wan2.2",
+      "commit": "1ea34ff48f87168174e12956e200b1d908b1c5ff",
+      "sources": [
+        {
+          "kind": "readme",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/Wan-Video/Wan2.2/1ea34ff48f87168174e12956e200b1d908b1c5ff/README.md",
+          "bytes": 35804,
+          "sha256": "40222cb3a66cc89aa1cd84589d1fa696806c93c09cf1c4383b3994139202dfa1"
+        },
+        {
+          "kind": "license",
+          "path": "LICENSE.txt",
+          "url": "https://raw.githubusercontent.com/Wan-Video/Wan2.2/1ea34ff48f87168174e12956e200b1d908b1c5ff/LICENSE.txt",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ]
+    }
+  ],
+  "supplemental": [
+    {
+      "name": "issue-1.html",
+      "url": "https://github.com/yma71687-del/123/issues/1",
+      "bytes": 202098,
+      "sha256": "2aae6fd33d13a0a2d1abda8d7222cfc2fa503ee3d3e53416b2edd1005dec8384"
+    },
+    {
+      "name": "fiber-readme.md",
+      "url": "https://raw.githubusercontent.com/pmndrs/react-three-fiber/d74622ea8ed717f7212d7e19d65ff3e325508389/readme.md",
+      "bytes": 14301,
+      "sha256": "29c7319a41a30b95319e68d540672efaa31a2c3bd44bad6ef2e48b93d00d4ab6"
+    },
+    {
+      "name": "remotion-pinned-installed-license.md",
+      "url": "https://raw.githubusercontent.com/remotion-dev/remotion/v4.0.538/LICENSE.md",
+      "bytes": 2823,
+      "sha256": "bd65083b940f61904f6ef298aade918a7cad72a3e35bc406e36fab365844b673"
+    },
+    {
+      "name": "sam2-license",
+      "url": "https://raw.githubusercontent.com/facebookresearch/sam2/main/LICENSE",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    }
+  ],
+  "blocked_or_unverified": [
+    "https://api.github.com/search/repositories",
+    "https://api.github.com/repos/yma71687-del/123/issues/1",
+    "https://huggingface.co/Qwen/Qwen-Image-Layered/raw/main/README.md",
+    "https://github.com/openvideodev/openvideo"
+  ]
+}

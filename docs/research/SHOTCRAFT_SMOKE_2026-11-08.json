@@ -1,0 +1,116 @@
+{
+  "upstream": "Vincentwei1021/video-shotcraft",
+  "commit": "1266a3ec4831289c4d893d42dd5102723658039a",
+  "remotion": "4.0.538",
+  "elapsedSeconds": 21.821,
+  "scope": "Two upstream demo components; no workbench, AI inference or Tencent deployment validation.",
+  "frames": [
+    {
+      "id": "FlyingWords",
+      "frame": 15,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "sha256": "afd0a496a1a373690b09e1087e685a1a9f0be310fda1a399423fb35e13217081",
+      "channelMean": [
+        18.706680652006174,
+        24.481079282407407,
+        42.98568576388889
+      ]
+    },
+    {
+      "id": "FlyingWords",
+      "frame": 75,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "sha256": "f2d90509c2b161b2c595224baf5afd5f6c4f42fb6ccd09c48b506e3c7562158f",
+      "channelMean": [
+        18.303250868055557,
+        23.78507282021605,
+        41.522459490740744
+      ]
+    },
+    {
+      "id": "FlyingWords",
+      "frame": 135,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "sha256": "bec41e0318a0a142780df1ddc561931e1947f17b06be245ac2b3528fea31ae79",
+      "channelMean": [
+        19.105199652777777,
+        24.81296199845679,
+        43.1156322337963
+      ]
+    },
+    {
+      "id": "ExplodedView",
+      "frame": 15,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "sha256": "d289055f9a8da9ae4eca0e983a723678717dd275a78a5b954107e177d2a0aa31",
+      "channelMean": [
+        229.42911795910493,
+        234.51244888117284,
+        240.7434905478395
+      ]
+    },
+    {
+      "id": "ExplodedView",
+      "frame": 75,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "sha256": "90364c750a50d728a69d898a03de0c93756787dca87ec16e23335707e424545d",
+      "channelMean": [
+        226.7618002507716,
+        231.9986868248457,
+        238.95497106481483
+      ]
+    },
+    {
+      "id": "ExplodedView",
+      "frame": 135,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "sha256": "67a775633718049d4d0134b87b2deff8fd01252ae25c606d6ce016af27cf03da",
+      "channelMean": [
+        229.05923177083332,
+        234.09643036265433,
+        240.42357011959876
+      ]
+    }
+  ],
+  "date": "2026-11-08",
+  "timezone": "Asia/Shanghai",
+  "inputSourceManifest": "VIDEO_STACK_SOURCES_2026-11-08.json",
+  "frameDifference": {
+    "FlyingWords": {
+      "frames": [
+        15,
+        75
+      ],
+      "meanAbsoluteChannelDifference": 6.551262377829218,
+      "scale": [
+        0,
+        255
+      ]
+    },
+    "ExplodedView": {
+      "frames": [
+        15,
+        75
+      ],
+      "meanAbsoluteChannelDifference": 7.211419592335392,
+      "scale": [
+        0,
+        255
+      ]
+    }
+  },
+  "verification": "Real Chromium still rendering with installed Remotion 4.0.538; visual contact sheet inspected. Not full workbench, video/audio encoding or visual acceptance.",
+  "warning": "Webpack cache path was absent; caching emitted ENOENT, but bundling and all six renders succeeded."
+}

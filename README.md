@@ -1,5 +1,7 @@
 # NEXUS FX STUDIO
 
+**新版技术方案（2026-11-08）：[GitHub 工具选型与 AI 宣传片系统重设计](docs/VIDEO_PLATFORM_REDESIGN_2026-11-08.md)**。核验 28 个仓库与固定源码，实渲两个 ShotCraft 镜头；包含图片分层、统一时间线、模型工作流、算力、迁移与验收方案。此项是调研与兼容性验证，尚未安装这些新能力或发布新版本。
+
 **直接操作：[下载广告工作台可操作试用包](deliverables/NEXUS-AD-WORKSPACE-0.5.4-interactive.zip?raw=true)**。解压后用桌面 Chrome／Edge 打开“打开广告工作台.html”。本机编辑、试听、素材导入与保存可用；云端渲染和参考解析需部署后使用。
 
 **当前界面版本 0.5.4：[实际界面与操作说明](docs/WORKSPACE_0.5.4.md)** · [桌面截图](deliverables/NEXUS-WORKSPACE-DESKTOP.png) · [手机截图](deliverables/NEXUS-WORKSPACE-MOBILE.png) · [源码、样片与启动包](deliverables/NEXUS-AD-STUDIO-0.5.4-source.zip?raw=true)。新增真实悬停效果预览、分镜定位、聚焦工具面板、保存状态和逐张产品图管理。所有入口沿用真实预览、保存及视频渲染服务。
