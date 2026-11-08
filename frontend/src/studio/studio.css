@@ -745,3 +745,29 @@
     transition: none;
   }
 }
+
+.st-preview {
+  position: relative;
+}
+.st-preview-controls {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  opacity: 0.85;
+}
+.studio-shell .st-preview-controls button {
+  background: #0b1724d9;
+  font-size: 11px;
+  padding: 6px 10px;
+}
+.st-preview:fullscreen {
+  background: #03080d;
+  border-radius: 0;
+}
+.st-preview:fullscreen .st-preview-controls {
+  bottom: 20px;
+}

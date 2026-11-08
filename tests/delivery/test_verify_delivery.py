@@ -57,6 +57,11 @@ class MediaVerification(unittest.TestCase):
     def test_no_audio_is_rejected(self):
         with self.assertRaisesRegex(DeliveryVerificationError,'音轨'):verify(self.url('b'))
 
+    def test_studio_namespace_keeps_real_media_validation(self):
+        self.assertTrue(verify(self.url('a').replace('/api/advertising/','/api/studio/'))['ok'])
+        with self.assertRaisesRegex(DeliveryVerificationError,'音轨'):
+            verify(self.url('b').replace('/api/advertising/','/api/studio/'))
+
     def test_missing_burned_subtitles_are_rejected(self):
         with self.assertRaisesRegex(DeliveryVerificationError,'字幕'):verify(self.url('c'))
 

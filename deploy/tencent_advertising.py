@@ -379,11 +379,11 @@ def verify_sample_download(base, password, job_id, expected):
     if checksum.hexdigest()!=expected:raise RuntimeError('入口下载的视频与实际验收样片不一致')
     return {'bytes':size,'sha256':checksum.hexdigest()}
 
-def main():
+def main(*, default_state=None, default_project='nexus-ad-v054', default_port=43154, entrypoint='#advertising', application_label='广告工作台'):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--state-dir',type=Path,default=Path.home()/'.local/share/nexus-advertising-v054')
-    parser.add_argument('--project',default='nexus-ad-v054')
-    parser.add_argument('--port',type=int,default=43154)
+    parser.add_argument('--state-dir',type=Path,default=default_state or Path.home()/'.local/share/nexus-advertising-v054')
+    parser.add_argument('--project',default=default_project)
+    parser.add_argument('--port',type=int,default=default_port)
     credentials=parser.add_mutually_exclusive_group()
     credentials.add_argument('--password-file',type=Path)
     credentials.add_argument('--auto-password',action='store_true',help='自动生成并复用网页密码，无需输入；仅显示在终端并保存到私有 login.json')
@@ -468,8 +468,8 @@ def main():
         time.sleep(3)
     else:raise RuntimeError('公网验收尚未通过：'+last+'。本机数据保留，不能据隧道日志中的地址宣称上线')
     verify_protected_containers(docker,args.project,before)
-    write_private(state/'url.txt',url+'/#advertising\n')
-    print('\n公网登录及广告服务验收通过：'+url+'/#advertising'+'\n网页登录用户名：nexus')
+    write_private(state/'url.txt',url+'/'+entrypoint+'\n')
+    print('\n公网登录及'+application_label+'验收通过：'+url+'/'+entrypoint+'\n网页登录用户名：nexus')
     if args.auto_password:show_automatic_login(state,password)
     else:print('密码为刚才在终端输入的值，不会打印。')
     print('这是临时 HTTPS 地址，隧道重建可能变化；固定域名尚需接入。\n现有工程未迁移，原有服务未替换。')

@@ -28,7 +28,7 @@ def verify(url):
     target = urllib.parse.urlsplit(url)
     if (target.scheme != 'http' or target.hostname not in ('render', '127.0.0.1', 'localhost')
             or target.username or target.password or target.query or target.fragment
-            or not re.fullmatch(r'/api/advertising/jobs/[a-f0-9]{32}/file', target.path)):
+            or not re.fullmatch(r'/api/(?:advertising|studio)/jobs/[a-f0-9]{32}/file', target.path)):
         raise DeliveryVerificationError('验收只允许读取内部渲染任务')
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, *args, **kwargs):

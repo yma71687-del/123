@@ -46,6 +46,18 @@ const uid = () => crypto.randomUUID().replaceAll("-", "");
 const seconds = (frame: number) => (frame / 30).toFixed(2) + "s";
 const recipeName = (shot: StudioShot) =>
   recipes.find((r) => r.id === shot.recipe)?.name ?? "旧广告（原参数保留）";
+const audioNames: Record<string, string> = {
+  pulse: "原创配乐",
+  whoosh: "转场掠过",
+  impact: "低频强调",
+  click: "轻触声",
+};
+const propertyNames: Record<string, string> = {
+  x: "水平位置",
+  y: "垂直位置",
+  scale: "缩放",
+  opacity: "不透明度",
+};
 const jobNames: Record<string, string> = {
   queued: "排队中",
   running: "正在渲染",
@@ -56,6 +68,10 @@ const jobNames: Record<string, string> = {
 
 export function Studio() {
   const history = useRef(new StudioHistory(defaultStudio()));
+  const previewBox = useRef<HTMLDivElement>(null);
+  const [playing, setPlaying] = useState(false),
+    [previewMuted, setPreviewMuted] = useState(false),
+    [fullscreen, setFullscreen] = useState(false);
   const edited = useRef(false);
   const [project, setProject] = useState(history.current.current);
   const [selection, setSelection] = useState<Selection>({
@@ -236,7 +252,20 @@ export function Studio() {
     const update = (e: { detail: { frame: number } }) =>
       setFrame(e.detail.frame);
     current.addEventListener("frameupdate", update);
-    return () => current.removeEventListener("frameupdate", update);
+    const playback = () => setPlaying(current.isPlaying());
+    const full = () =>
+      setFullscreen(document.fullscreenElement === previewBox.current);
+    current.addEventListener("play", playback);
+    current.addEventListener("pause", playback);
+    current.addEventListener("ended", playback);
+    document.addEventListener("fullscreenchange", full);
+    return () => {
+      current.removeEventListener("frameupdate", update);
+      current.removeEventListener("play", playback);
+      current.removeEventListener("pause", playback);
+      current.removeEventListener("ended", playback);
+      document.removeEventListener("fullscreenchange", full);
+    };
   }, []);
   useEffect(() => {
     if (!ready) return;
@@ -460,7 +489,7 @@ export function Studio() {
           </b>
           <div>
             <strong>NEXUS</strong>
-            <small>AI FILM WORKSPACE · 首批编辑能力</small>
+            <small>广告片创作工作台 · 开发预览</small>
           </div>
         </div>
         <label className="st-project-name">
@@ -691,14 +720,18 @@ export function Studio() {
         <section className="st-center">
           <div className="st-preview-heading">
             <div>
-              <small>PROGRAM MONITOR</small>
+              <small>画面预览</small>
               <h1>
                 {selectedShot ? recipeName(selectedShot) : "声音与画面预览"}
               </h1>
             </div>
-            <span>1920 × 1080 / 30 FPS</span>
+            <span>1920 × 1080 / 每秒30帧</span>
           </div>
-          <div className="st-preview" data-testid="studio-preview">
+          <div
+            ref={previewBox}
+            className="st-preview"
+            data-testid="studio-preview"
+          >
             <Player
               ref={player}
               component={StudioFilm}
@@ -711,7 +744,7 @@ export function Studio() {
               compositionWidth={1920}
               compositionHeight={1080}
               fps={30}
-              controls
+              controls={false}
               style={{ width: "100%", height: "100%" }}
               errorFallback={({ error }) => (
                 <div role="alert">
@@ -719,6 +752,42 @@ export function Studio() {
                 </div>
               )}
             />
+            <div
+              className="st-preview-controls"
+              role="group"
+              aria-label="预览控制"
+            >
+              <button onClick={() => player.current?.toggle()}>
+                {playing ? "暂停预览" : "播放预览"}
+              </button>
+              <button
+                onClick={() => {
+                  const current = player.current;
+                  if (!current) return;
+                  if (current.isMuted()) {
+                    current.unmute();
+                    setPreviewMuted(false);
+                  } else {
+                    current.mute();
+                    setPreviewMuted(true);
+                  }
+                }}
+              >
+                {previewMuted ? "取消静音" : "静音预览"}
+              </button>
+              <button
+                onClick={() => {
+                  const operation = fullscreen
+                    ? document.exitFullscreen()
+                    : previewBox.current?.requestFullscreen();
+                  operation?.catch((e) =>
+                    note("全屏未完成：" + message(e), true),
+                  );
+                }}
+              >
+                {fullscreen ? "退出全屏" : "全屏预览"}
+              </button>
+            </div>
           </div>
           <div className="st-transport">
             <span data-testid="studio-frame">
@@ -871,7 +940,7 @@ export function Studio() {
                         a.durationFrames,
                         (a.assetId
                           ? assets.find((v) => v.id === a.assetId)?.name
-                          : null) ?? a.builtin,
+                          : null) ?? audioNames[a.builtin],
                       )}
                       <i
                         className="st-playhead"
@@ -1176,7 +1245,9 @@ export function Studio() {
                   }}
                 >
                   {["x", "y", "scale", "opacity"].map((k) => (
-                    <option key={k}>{k}</option>
+                    <option key={k} value={k}>
+                      {propertyNames[k]}
+                    </option>
                   ))}
                 </select>
                 <DraftInput
@@ -1222,7 +1293,7 @@ export function Studio() {
                           )
                         }
                       >
-                        {k.property} · {k.frame}f → {k.value}
+                        {propertyNames[k.property]} · {k.frame}f → {k.value}
                       </button>
                       <button
                         aria-label={"删除关键帧 " + k.property + " " + k.frame}
@@ -1413,9 +1484,9 @@ export function Studio() {
                     }
                   >
                     <option value="pulse">原创配乐</option>
-                    <option value="whoosh">Whoosh</option>
-                    <option value="impact">Impact</option>
-                    <option value="click">Click</option>
+                    <option value="whoosh">转场掠过</option>
+                    <option value="impact">低频强调</option>
+                    <option value="click">轻触声</option>
                   </select>
                 </label>
               )}
@@ -1435,7 +1506,7 @@ export function Studio() {
           <hr />
           <h3>工程与输出</h3>
           <label>
-            工程总帧数（30 FPS）
+            工程总帧数（每秒30帧）
             <DraftInput
               aria-label="工程总帧数"
               type="number"
