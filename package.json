@@ -29,7 +29,7 @@
     "react-dom": "19.2.0",
     "remotion": "4.0.538",
     "three": "0.160.0",
-    "zod": "4.5.4"
+    "zod": "4.6.6"
   },
   "devDependencies": {
     "@types/node": "24.10.0",
@@ -42,5 +42,8 @@
     "typescript": "5.9.3",
     "vite": "7.3.7"
   },
-  "type": "module"
+  "type": "module",
+  "overrides": {
+    "zod": "$zod"
+  }
 }

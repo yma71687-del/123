@@ -24,10 +24,8 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm run build
-          npm run build:preview
-          node tools/build_ad_preview.mjs
-          git diff --exit-code -- deliverables/NEXUS-AD-WORKSPACE-0.5.4-interactive.zip
-          git diff --exit-code -- preview/NEXUS-FX-STUDIO-0.4.0.zip
+          python tools/verify_legacy_previews.py
+          npm audit --omit=dev --audit-level=high
           npm run check:format
           npm run test:unit
       - name: Install API and browser test dependencies
