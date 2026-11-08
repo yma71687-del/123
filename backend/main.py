@@ -71,11 +71,14 @@ def health():
     return {'ok':True, 'service':'nexus-fx-studio', 'version':'0.4.0'}
 
 
+@app.api_route('/api/studio/{path:path}', methods=['GET','PUT','POST','DELETE'])
 @app.api_route('/api/advertising/{path:path}', methods=['GET','PUT','POST','DELETE'])
 async def advertising_proxy(path: str, request: Request):
     # Only these same-origin routes are exposed. The caller never supplies a host,
     # a filesystem path or the render worker's internal media-serving endpoint.
-    if not re.fullmatch(r'health|project|jobs(?:/[a-f0-9]{32}(?:/file)?)?', path):
+    studio=request.url.path.startswith('/api/studio/')
+    allowed=r'health|projects(?:/[a-f0-9]{32}(?:/versions(?:/[0-9]{1,3})?)?)?|jobs(?:/[a-f0-9]{32}(?:/file)?)?' if studio else r'health|project|jobs(?:/[a-f0-9]{32}(?:/file)?)?'
+    if not re.fullmatch(allowed, path):
         raise HTTPException(404, 'Advertising route not found')
     if not AD_SERVICE:
         raise HTTPException(503, '广告渲染服务尚未启动；工程可先导出到本机')
@@ -84,7 +87,7 @@ async def advertising_proxy(path: str, request: Request):
         payload.extend(chunk)
         if len(payload)>128*1024:
             raise HTTPException(413, 'Advertising request exceeds 128 KB')
-    target = AD_SERVICE+'/api/advertising/'+path
+    target = AD_SERVICE+('/api/studio/' if studio else '/api/advertising/')+path
     outgoing = urllib.request.Request(target, data=bytes(payload) if payload else None,
         method=request.method, headers={'Content-Type':'application/json'})
     try:

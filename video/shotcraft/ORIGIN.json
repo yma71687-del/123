@@ -1,0 +1,20 @@
+{
+  "repository": "https://github.com/Vincentwei1021/video-shotcraft",
+  "commit": "1266a3ec4831289c4d893d42dd5102723658039a",
+  "license": "Apache-2.0",
+  "changes": "FlyingWords adapted for brand, headline, keywords, accent and source duration; Polish and Look formatting only. No upstream audio or demonstration product screenshots included.",
+  "files": [
+    {
+      "path": "demos/_fixtures/Polish.tsx",
+      "upstreamSha256": "21dfe2f36325c07ccaa1a619007e24a2b5b3d6a82030d3c1772de902551c2842"
+    },
+    {
+      "path": "demos/_fixtures/Look.tsx",
+      "upstreamSha256": "88b97d49a5489126eaaaff2269d02fd491ccbd7f13f3e1d6df764a592635ae28"
+    },
+    {
+      "path": "demos/typography/flying-words/FlyingWords.tsx",
+      "upstreamSha256": "94d7327be1e42d2a4d76bcf7494272fe5564178112e9b2e7f76f3f99cfc00366"
+    }
+  ]
+}

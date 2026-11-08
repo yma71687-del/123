@@ -30,6 +30,13 @@ import {
   renderRequestSchema,
   type AdProject,
 } from "../video/schema";
+import {
+  studioSchema,
+  studioAssetIds,
+  type StudioProject,
+} from "../video/studio/schema";
+import { StudioStore } from "./studioStore";
+import { z } from "zod";
 
 const ROOT = resolve(process.env.NEXUS_ROOT || process.cwd());
 const DATA = resolve(process.env.AD_DATA_DIR || join(ROOT, ".ad-data"));
@@ -41,6 +48,14 @@ const HOST = process.env.AD_HOST || "127.0.0.1";
 const browserExecutable = process.env.CHROME_EXECUTABLE || "/usr/bin/chromium";
 const JOBS = join(DATA, "jobs"),
   PROJECT = join(DATA, "project.json");
+const studioStore = new StudioStore(join(DATA, "studio-projects"));
+const studioRenderSchema = z
+  .object({
+    project: studioSchema,
+    resolution: z.enum(["720p", "1080p"]),
+    format: z.literal("mp4"),
+  })
+  .strict();
 const idPattern = /^[a-f0-9]{32}$/;
 type Job = {
   id: string;
@@ -51,9 +66,11 @@ type Job = {
   resolution: "720p" | "1080p";
   createdAt: string;
   error?: string;
-  project: AdProject;
   elapsedSeconds?: number;
-};
+} & (
+  | { kind?: "advertising"; project: AdProject }
+  | { kind: "studio"; project: StudioProject }
+);
 const jobs = new Map<string, Job>();
 const cancelers = new Map<string, () => void>();
 const writes = new Map<string, Promise<void>>();
@@ -108,7 +125,11 @@ function publicJob(job: Job) {
     ...rest,
     downloadUrl:
       job.status === "done"
-        ? "/api/advertising/jobs/" + job.id + "/file"
+        ? (job.kind === "studio"
+            ? "/api/studio/jobs/"
+            : "/api/advertising/jobs/") +
+          job.id +
+          "/file"
         : null,
   };
 }
@@ -173,7 +194,8 @@ for (const filename of await readdir(JOBS)) {
   try {
     const job = JSON.parse(await readFile(join(JOBS, filename), "utf8")) as Job;
     if (!idPattern.test(job.id) || filename !== job.id + ".json") continue;
-    job.project = adSchema.parse(job.project);
+    if (job.kind === "studio") job.project = studioSchema.parse(job.project);
+    else job.project = adSchema.parse(job.project);
     if (job.status === "running" || job.status === "queued") {
       job.status = "failed";
       job.error = "服务重启中断了上次任务，请重新提交";
@@ -219,7 +241,7 @@ async function pump() {
     };
     const composition = await selectComposition({
       serveUrl,
-      id: "NexusAd",
+      id: job.kind === "studio" ? "NexusStudio" : "NexusAd",
       inputProps,
       browserExecutable,
       chromiumOptions: { disableWebSecurity: false },
@@ -284,9 +306,55 @@ async function pump() {
 }
 
 const server = createServer(async (req, res) => {
-  const path = new URL(req.url || "/", `http://127.0.0.1:${PORT}`).pathname;
+  const rawPath = new URL(req.url || "/", `http://127.0.0.1:${PORT}`).pathname;
+  const studio = rawPath.startsWith("/api/studio/");
+  const path =
+    studio &&
+    /^\/api\/studio\/(health|jobs(?:\/[a-f0-9]{32}(?:\/file)?)?)$/.test(rawPath)
+      ? rawPath.replace("/api/studio/", "/api/advertising/")
+      : rawPath;
   const method = req.method;
   try {
+    if (rawPath === "/api/studio/projects" && method === "GET")
+      return json(res, 200, { projects: await studioStore.list() });
+    const projectMatch = rawPath.match(
+      /^\/api\/studio\/projects\/([a-f0-9]{32})(?:\/versions(?:\/(\d+))?)?$/,
+    );
+    if (projectMatch && method === "GET") {
+      if (rawPath.endsWith("/versions"))
+        return json(res, 200, await studioStore.versions(projectMatch[1]));
+      return json(
+        res,
+        200,
+        await studioStore.get(
+          projectMatch[1],
+          projectMatch[2] ? Number(projectMatch[2]) : undefined,
+        ),
+      );
+    }
+    if (
+      (rawPath === "/api/studio/projects" && method === "POST") ||
+      (projectMatch && !rawPath.includes("/versions") && method === "PUT")
+    ) {
+      const incoming = await body(req);
+      const parsed = studioSchema.safeParse(incoming.project);
+      if (!parsed.success)
+        return json(res, 422, {
+          detail: parsed.error.issues.map((i) => i.message).join("；"),
+        });
+      const ids = studioAssetIds(parsed.data);
+      for (const id of ids.images) await asset(id, "image");
+      for (const id of ids.audio) await asset(id, "audio");
+      return json(
+        res,
+        method === "POST" ? 201 : 200,
+        await studioStore.save(
+          parsed.data,
+          projectMatch?.[1],
+          incoming.expectedRevision,
+        ),
+      );
+    }
     if (path === "/api/advertising/health" && method === "GET")
       return json(res, 200, {
         ok: true,
@@ -294,7 +362,11 @@ const server = createServer(async (req, res) => {
         version: "0.5.2",
         remotion: "4.0.538",
         projectVersion: 2,
-        capabilities: { captions: true, subtitleImports: ["srt", "vtt"] },
+        capabilities: {
+          captions: true,
+          subtitleImports: ["srt", "vtt"],
+          studioProjectIR: 1,
+        },
         storageFreeBytes: await statfs(DATA).then(
           (disk) => disk.bavail * disk.bsize,
         ),
@@ -356,10 +428,16 @@ const server = createServer(async (req, res) => {
     }
     if (path === "/api/advertising/jobs" && method === "GET")
       return json(res, 200, {
-        jobs: [...jobs.values()].reverse().slice(0, 50).map(publicJob),
+        jobs: [...jobs.values()]
+          .filter((j) => (j.kind === "studio") === studio)
+          .reverse()
+          .slice(0, 50)
+          .map(publicJob),
       });
     if (path === "/api/advertising/jobs" && method === "POST") {
-      const parsed = renderRequestSchema.safeParse(await body(req));
+      const parsed = (
+        studio ? studioRenderSchema : renderRequestSchema
+      ).safeParse(await body(req));
       if (!parsed.success)
         return json(res, 422, {
           detail: parsed.error.issues.map((i) => i.message).join("；"),
@@ -389,10 +467,16 @@ const server = createServer(async (req, res) => {
             detail: "广告导出已占用超过 1 GB，请先删除不需要的历史任务",
           });
         const request = parsed.data;
-        for (const id of request.project.imageAssetIds)
-          await asset(id, "image");
-        if (request.project.music.assetId)
-          await asset(request.project.music.assetId, "audio");
+        const references = studio
+          ? studioAssetIds(request.project as StudioProject)
+          : {
+              images: (request.project as AdProject).imageAssetIds,
+              audio: [(request.project as AdProject).music.assetId].filter(
+                (a): a is string => Boolean(a),
+              ),
+            };
+        for (const id of references.images) await asset(id, "image");
+        for (const id of references.audio) await asset(id, "audio");
         const job: Job = {
           id: randomUUID().replaceAll("-", ""),
           name: request.project.name,
@@ -401,7 +485,15 @@ const server = createServer(async (req, res) => {
           format: request.format,
           resolution: request.resolution,
           createdAt: new Date().toISOString(),
-          project: request.project,
+          ...(studio
+            ? {
+                kind: "studio" as const,
+                project: request.project as StudioProject,
+              }
+            : {
+                kind: "advertising" as const,
+                project: request.project as AdProject,
+              }),
         };
         await persist(job);
         jobs.set(job.id, job);
@@ -415,7 +507,8 @@ const server = createServer(async (req, res) => {
     );
     if (match) {
       const job = jobs.get(match[1]);
-      if (!job) return json(res, 404, { detail: "任务不存在" });
+      if (!job || (job.kind === "studio") !== studio)
+        return json(res, 404, { detail: "任务不存在" });
       if (match[2] && method === "GET") {
         if (job.status !== "done")
           return json(res, 409, { detail: "视频尚未完成" });

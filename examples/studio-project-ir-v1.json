@@ -1,0 +1,149 @@
+{
+  "project": {
+    "format": "nexus-project-ir",
+    "version": 1,
+    "name": "NEXUS / 产品宣传片",
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "durationFrames": 450,
+    "shots": [
+      {
+        "id": "hero",
+        "recipe": "hero",
+        "startFrame": 0,
+        "durationFrames": 150,
+        "sourceInFrame": 0,
+        "sourceDurationFrames": 150,
+        "enabled": true,
+        "params": {
+          "brand": "NEXUS",
+          "headline": "让产品，成为主角",
+          "subtitle": "PRODUCT FILM / MOTION SYSTEM",
+          "accent": "#78e8dc",
+          "keywords": [
+            "创意",
+            "光影",
+            "设计",
+            "品牌",
+            "声音",
+            "质感"
+          ],
+          "imageAssetIds": []
+        },
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1,
+          "opacity": 1
+        },
+        "keyframes": []
+      },
+      {
+        "id": "tunnel",
+        "recipe": "tunnel",
+        "startFrame": 150,
+        "durationFrames": 150,
+        "sourceInFrame": 0,
+        "sourceDurationFrames": 150,
+        "enabled": true,
+        "params": {
+          "brand": "NEXUS",
+          "headline": "创意，穿越想象",
+          "subtitle": "PRODUCT FILM / MOTION SYSTEM",
+          "accent": "#78e8dc",
+          "keywords": [
+            "创意",
+            "光影",
+            "设计",
+            "品牌",
+            "声音",
+            "质感"
+          ],
+          "imageAssetIds": []
+        },
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1,
+          "opacity": 1
+        },
+        "keyframes": []
+      },
+      {
+        "id": "layers",
+        "recipe": "layers",
+        "startFrame": 300,
+        "durationFrames": 150,
+        "sourceInFrame": 0,
+        "sourceDurationFrames": 150,
+        "enabled": true,
+        "params": {
+          "brand": "NEXUS",
+          "headline": "每一层，都能被编辑",
+          "subtitle": "PRODUCT FILM / MOTION SYSTEM",
+          "accent": "#78e8dc",
+          "keywords": [
+            "创意",
+            "光影",
+            "设计",
+            "品牌",
+            "声音",
+            "质感"
+          ],
+          "imageAssetIds": []
+        },
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale": 1,
+          "opacity": 1
+        },
+        "keyframes": []
+      }
+    ],
+    "audio": [
+      {
+        "id": "music",
+        "kind": "music",
+        "assetId": null,
+        "builtin": "pulse",
+        "startFrame": 0,
+        "sourceInFrame": 0,
+        "durationFrames": 450,
+        "gain": 0.22,
+        "muted": false
+      },
+      {
+        "id": "whoosh",
+        "kind": "sfx",
+        "assetId": null,
+        "builtin": "whoosh",
+        "startFrame": 150,
+        "sourceInFrame": 0,
+        "durationFrames": 24,
+        "gain": 0.4,
+        "muted": false
+      },
+      {
+        "id": "impact",
+        "kind": "sfx",
+        "assetId": null,
+        "builtin": "impact",
+        "startFrame": 300,
+        "sourceInFrame": 0,
+        "durationFrames": 30,
+        "gain": 0.35,
+        "muted": false
+      }
+    ],
+    "captions": {
+      "enabled": false,
+      "style": "tech",
+      "position": "bottom",
+      "fontSize": 56,
+      "color": "#ffffff",
+      "cues": []
+    }
+  }
+}

@@ -3,8 +3,9 @@ from pathlib import Path
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 ROOT=Path(__file__).resolve().parents[1]
 entries={'打开广告工作台.html':ROOT/'preview-dist/advertising/打开广告工作台.html','使用说明.txt':ROOT/'preview-dist/advertising/使用说明.txt'}
-for file in sorted((ROOT/'frontend/public/licenses').iterdir()):
-    if file.is_file():entries['licenses/'+file.name]=file
+# This frozen standalone entry does not import the new studio/ShotCraft runtime.
+for name in ['react.txt','remotion-third-party.md','remotion.md','three.txt']:
+    entries['licenses/'+name]=ROOT/'frontend/public/licenses'/name
 path=ROOT/'deliverables/NEXUS-AD-WORKSPACE-0.5.4-interactive.zip'
 with ZipFile(path,'w',compression=ZIP_DEFLATED,compresslevel=9) as archive:
     for name,file in entries.items():

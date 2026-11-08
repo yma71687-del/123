@@ -68,6 +68,10 @@ jobs:
         env:
           PLAYWRIGHT_USE_BUNDLED: '1'
         run: .venv/bin/python -m unittest discover -s tests/advertising -v
+      - name: Project IR browser editing, version conflicts and actual three-shot MP4
+        env:
+          PLAYWRIGHT_USE_BUNDLED: '1'
+        run: .venv/bin/python -m unittest discover -s tests/studio -v
       - name: Actual isolated authenticated advertising Docker stack
         env:
           PLAYWRIGHT_USE_BUNDLED: '1'
