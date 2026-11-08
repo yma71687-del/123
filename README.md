@@ -6,6 +6,8 @@
 
 - [当前功能与使用说明](docs/STUDIO_FIRST_BATCH.md)
 - [腾讯云新版独立部署](deploy/STUDIO.md)
+- [0.6.0 完整源码与部署包](deliverables/NEXUS-STUDIO-0.6.0-source.zip?raw=true)
+- [0.6.0 部署验收记录](docs/TEST_REPORT_STUDIO_0.6.0_DEPLOYMENT.md)
 - [实际中文界面](deliverables/NEXUS-STUDIO-FIRST-BATCH-DESKTOP.png)
 - [9 秒带声演示片](deliverables/NEXUS-STUDIO-FIRST-BATCH-720p.mp4?raw=true)
 - [可导入的演示工程](examples/studio-first-batch-sample.json)

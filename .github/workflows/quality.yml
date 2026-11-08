@@ -8,7 +8,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -78,6 +78,14 @@ jobs:
           docker tag nexus-fx-review-web:0.4.0 nexus-fx-ad-web:0.5.0
           docker build -f Dockerfile.render -t nexus-ad-renderer:0.5.0 .
           .venv/bin/python tests/advertising/docker_stack.py
+      - name: Fixed-source studio deployment, authenticated editing and actual MP4 delivery
+        env:
+          PLAYWRIGHT_USE_BUNDLED: '1'
+        run: |
+          docker tag nexus-fx-ad-api:0.5.0 nexus-studio-api:0.6.0
+          docker tag nexus-fx-ad-web:0.5.0 nexus-studio-web:0.6.0
+          docker tag nexus-ad-renderer:0.5.0 nexus-studio-render:0.6.0
+          .venv/bin/python tests/studio/docker_delivery.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

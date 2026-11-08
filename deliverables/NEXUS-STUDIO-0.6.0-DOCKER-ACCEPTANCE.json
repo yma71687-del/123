@@ -1,0 +1,39 @@
+{
+  "acceptance": {
+    "source": "b382283f6b6e257b6091d0ca8e271a8d72191088",
+    "projectId": "c3d1de5821f14136b9afcb9c1b314a08",
+    "jobId": "ba1738cf5c7d42f684c562be9570d5ac",
+    "status": "done",
+    "verifiedAt": "2026-11-08T10:19:17.390579+00:00",
+    "media": {
+      "ok": true,
+      "duration": 4.011,
+      "width": 1280,
+      "height": 720,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "audioPeak": 6545,
+      "audioRms": 870.57,
+      "subtitlePixels": {
+        "before": 0,
+        "during": 9172,
+        "after": 0
+      },
+      "changedChannels": 42684,
+      "bytes": 1714054,
+      "sha256": "0b4224ad2e6c8ff09cb278c982453833e7005353ca4a49ec0d1cc962813d928f"
+    }
+  },
+  "images": {
+    "api": "sha256:437501d052308146a6d432f2876fed9aa14fde7202fb2842ea944e759fde8e2c",
+    "web": "sha256:2643de97257a5588738988bf396ad439d1aaf0e43a2ae77a48d5a192c745aeb8",
+    "render": "sha256:4ea38f7165ca2e82e40029db49ed17b3246c2e1e549b36fb9bae03109a9032b7"
+  },
+  "sourceFilesMatchFixedPackage": true,
+  "authenticatedChineseUI": true,
+  "uploadedProductEncoded": true,
+  "customerAndLegacyProjectsPreserved": true,
+  "repeatAcceptanceReusedJob": true,
+  "otherRunningContainersPreserved": true,
+  "publicTencentVerified": false
+}
